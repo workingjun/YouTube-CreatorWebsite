@@ -83,11 +83,11 @@ class HtmlManager:
                 </td>
             </tr>
             """
-
+        subscriber_count = format(self.youtube_manager.ChannelInformation()[2], ",")
         Body_output = self.BODY.format(
             channel_name=self.youtube_manager.ChannelInformation()[0],
             channelID=self.youtube_manager.ChannelInformation()[1],
-            subscriber_count=self.youtube_manager.ChannelInformation()[2],
+            subscriber_count=subscriber_count,
             video_rows=video_rows,
             comment_rows=comment_rows
             )
