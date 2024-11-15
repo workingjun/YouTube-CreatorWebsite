@@ -3,9 +3,8 @@ from googleapiclient.discovery import build
 import re 
 
 class YouTubeManager:
-    def __init__(self, channelId):
+    def __init__(self, api_key, channelId):
         # YouTube API 설정
-        api_key = "AIzaSyDA38IZdJjA6BEgkUe_TKeQc2q9YPUf0xE"
         self.youtube = build("youtube", "v3", developerKey=api_key)
         self.channelId = channelId
 

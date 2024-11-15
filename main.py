@@ -12,8 +12,9 @@ if __name__=="__main__":
     load_dotenv("./.env")
     email = os.getenv("email")
     sender_password = os.getenv("sender_password")
+    api_key = os.getenv("api_key")
     for name in channelId:
-        youtube_manager = YouTubeManager(channelId[name])
+        youtube_manager = YouTubeManager(api_key, channelId[name])
         html_manager = HtmlManager(youtube_manager)
         Body += html_manager.htmlrun()
     template = html_manager.load_template()
