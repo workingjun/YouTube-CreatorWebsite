@@ -19,6 +19,20 @@ class YouTubeManager:
         information = [channelName, self.channelId, subscriberCount]
         return information
 
+    def videoId(self, count):
+        request = self.youtube.search().list(
+            part="snippet",
+            channelId=self.channelId,
+            maxResults=count,
+            order="date"
+        )
+        video_ids = []
+        response = request.execute()
+        for item in response['items']:
+            if item['id']['kind'] == "youtube#video":
+                video_ids.append(item['id']['videoId'])
+        return video_ids
+
     def textDisplay(self, video_id):
         # 동영상 정보 요청
         video_request = self.youtube.videos().list(
@@ -33,7 +47,7 @@ class YouTubeManager:
         request = self.youtube.commentThreads().list(
             part="snippet",
             videoId=video_id,
-            maxResults=50,
+            maxResults=30,
             order="relevance"
         )
         response = request.execute()
@@ -49,20 +63,6 @@ class YouTubeManager:
             comments.append(text_clean)
             like_counts.append(like_count)
         return video_title, comments, like_counts
-
-    def videoId(self, count):
-        request = self.youtube.search().list(
-            part="snippet",
-            channelId=self.channelId,
-            maxResults=count,
-            order="date"
-        )
-        video_ids = []
-        response = request.execute()
-        for item in response['items']:
-            if item['id']['kind'] == "youtube#video":
-                video_ids.append(item['id']['videoId'])
-        return video_ids
 
     def statistics(self, video_id): 
         request = self.youtube.videos().list(
@@ -84,7 +84,7 @@ class YouTubeManager:
         videos_data = []
         comments_data = []
 
-        for video_id in self.videoId(20):
+        for video_id in self.videoId(30):
             stats = self.statistics(video_id)
             videos_data.append(stats)
 
