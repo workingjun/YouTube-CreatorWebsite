@@ -74,12 +74,15 @@ class HtmlManager:
             """
 
         comment_rows = ""
-        for _,row in df_comments.iterrows():
+        for _, row in df_comments.iterrows():
             comment_rows += f"""
             <tr>
                 <td style="width: 20%;"><a href="https://www.youtube.com/watch?v={row['video_id']}" target="_blank">{row['title']}</a></td>
                 <td>
-                    <ul>{''.join(f'<li>{comment}</li>' for comment in row["comments"])}</ul>
+                    <ul>
+                        {''.join(f'<li>{comment} <span style="font-size: 0.9em; color: gray;">👍 {like_count} likes</span></li>'
+                                for comment, like_count in zip(row["comments"], row["like_count"]))}
+                    </ul>
                 </td>
             </tr>
             """

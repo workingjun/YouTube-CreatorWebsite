@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 
 if __name__=="__main__":
-    Body=''; channelId = {"우정잉":'UCW945UjEs6Jm3rVNvPEALdg',}
+    Body=''; channelId = {"우정잉":'UCW945UjEs6Jm3rVNvPEALdg'}
     load_dotenv("./.env.google")
     email = os.getenv("email")
     sender_password = os.getenv("sender_password")

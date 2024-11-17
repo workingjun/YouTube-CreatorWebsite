@@ -40,11 +40,15 @@ class YouTubeManager:
 
         # 댓글 정리
         comments = []
+        like_counts = []
         for item in response['items']:
-            comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
-            comment_clean = re.sub(r'<.*?>', '', comment)
-            comments.append(comment_clean)
-        return video_title, comments
+            comment = item['snippet']['topLevelComment']['snippet']
+            text = comment['textDisplay']
+            like_count = comment['likeCount']
+            text_clean = re.sub(r'<.*?>', '', text)
+            comments.append(text_clean)
+            like_counts.append(like_count)
+        return video_title, comments, like_counts
 
     def videoId(self, count):
         request = self.youtube.search().list(
@@ -84,11 +88,12 @@ class YouTubeManager:
             stats = self.statistics(video_id)
             videos_data.append(stats)
 
-            video_title, comments = self.textDisplay(video_id)
+            video_title, comments, like_counts = self.textDisplay(video_id)
             comments_data.append({
                 'title': video_title, 
                 'video_id': video_id, 
-                'comments': comments
+                'comments': comments,
+                'like_count': like_counts
                 })
         df_videos = pd.DataFrame(videos_data)
         df_comments = pd.DataFrame(comments_data)
