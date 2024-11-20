@@ -1,5 +1,4 @@
-chrometemp/
 __pycache__/
 modules/__pycache__/
-.env.google
+data/.env.google
 Youtube.html
