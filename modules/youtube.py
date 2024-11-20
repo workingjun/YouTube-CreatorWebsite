@@ -99,14 +99,14 @@ class YouTubeManager:
         videos_data = []
         comments_data = []
 
-        if os.path.exists("videoId.json"):
+        if os.path.exists("data/videoId.json"):
             # JSON 파일 읽기
-            with open("videoId.json", "r", encoding="utf-8") as f:
+            with open("data/videoId.json", "r", encoding="utf-8") as f:
                 video_ids = json.load(f)
         else:
             self.save_videoId()
             # JSON 파일 읽기
-            with open("videoId.json", "r", encoding="utf-8") as f:
+            with open("data/videoId.json", "r", encoding="utf-8") as f:
                 video_ids = json.load(f)
 
         for video_id in video_ids:
@@ -125,7 +125,7 @@ class YouTubeManager:
 
         return df_videos, df_comments
     
-    def save_videoId(self, count=60):
+    def save_videoId(self, count=100):
         request = self.youtube.search().list(
             part="snippet",
             channelId=self.channelID,

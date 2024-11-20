@@ -368,6 +368,11 @@
                 const sortedVideos = videos.sort((a, b) => {
                     const valueA = Number(a.getAttribute(`data-${criteria}`));
                     const valueB = Number(b.getAttribute(`data-${criteria}`));
+                    
+                    // 기준이 default일 때 오름차순 정렬
+                    if (criteria === 'default') {
+                        return valueA - valueB; // 오름차순
+                    }
                     return valueB - valueA; // 내림차순
                 });
 
