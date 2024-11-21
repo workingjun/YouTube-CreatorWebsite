@@ -1,5 +1,5 @@
 from selenium.webdriver.common.by import By
-from modules.Chrome import ChromeManager
+from modules.example.Chrome import ChromeManager
 
 class NewsManager:
     def __init__(self, Chrome: ChromeManager):

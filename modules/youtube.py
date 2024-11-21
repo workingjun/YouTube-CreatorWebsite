@@ -1,9 +1,14 @@
 import pandas as pd
 from googleapiclient.discovery import build
 import re, json, os
+from dotenv import load_dotenv
 
 class YouTubeManager:
-    def __init__(self, api_key, channelID=None, channel_name=None):
+
+    PATH1 = "youtube_data/videoId.json"
+    PATH2 = "youtube_data/total_data.json"
+    
+    def __init__(self, api_key, count=-1, channelID=None, channel_name=None):
         # YouTube API 설정
         self.youtube = build("youtube", "v3", developerKey=api_key)
         self.channel_name = channel_name
@@ -11,6 +16,7 @@ class YouTubeManager:
             self.channelID = channelID
         else:
             self.channelID = self.get_channel_id_by_name()
+        self.count = count
 
     def get_channel_id_by_name(self):
         """채널 이름으로 채널 ID를 가져오는 함수"""
@@ -49,36 +55,44 @@ class YouTubeManager:
         return result
 
     def textDisplay(self, video_id):
-        # 동영상 정보 요청
-        video_request = self.youtube.videos().list(
-            part="snippet",
-            id=video_id  # 영상 ID
-        )
-        video_response = video_request.execute()
+        try:
+            # 동영상 정보 요청
+            video_request = self.youtube.videos().list(
+                part="snippet",
+                id=video_id  # 영상 ID
+            )
+            video_response = video_request.execute()
 
-        # 영상 제목 추출
-        video_title = video_response['items'][0]['snippet']['title']
+            # 영상 제목 추출
+            video_title = video_response['items'][0]['snippet']['title']
 
-        request = self.youtube.commentThreads().list(
-            part="snippet",
-            videoId=video_id,
-            maxResults=100,
-            order="relevance"
-        )
-        response = request.execute()
+            request = self.youtube.commentThreads().list(
+                part="snippet",
+                videoId=video_id,
+                maxResults=100,
+                order="relevance"
+            )
+            response = request.execute()
 
-        # 댓글 정리
-        comments = []
-        like_counts = []
-        for item in response['items']:
-            comment = item['snippet']['topLevelComment']['snippet']
-            text = comment['textDisplay']
-            like_count = comment['likeCount']
-            text_clean = re.sub(r'<.*?>', '', text)
-            comments.append(text_clean)
-            like_counts.append(like_count)
-        return video_title, comments, like_counts
-
+            # 댓글 정리
+            comments = []
+            like_counts = []
+            for item in response['items']:
+                comment = item['snippet']['topLevelComment']['snippet']
+                text = comment['textDisplay']
+                like_count = comment['likeCount']
+                text_clean = re.sub(r'<.*?>', '', text)
+                comments.append(text_clean)
+                like_counts.append(like_count)
+            return {
+                'title': video_title, 
+                'video_id': video_id, 
+                'comments': comments,
+                'like_count': like_counts
+                }
+        except:
+            return None
+        
     def statistics(self, video_id): 
         request = self.youtube.videos().list(
             part="snippet,statistics",
@@ -86,6 +100,8 @@ class YouTubeManager:
         )
         response = request.execute()
         for item in response['items']:
+            if 'viewCount' not in item['statistics']:
+                return None
             return {
                 'video_id': video_id,
                 'title': item['snippet']['localized']['title'],
@@ -98,50 +114,70 @@ class YouTubeManager:
     def collect_data(self):
         videos_data = []
         comments_data = []
-
-        if os.path.exists("data/videoId.json"):
-            # JSON 파일 읽기
-            with open("data/videoId.json", "r", encoding="utf-8") as f:
-                video_ids = json.load(f)
-        else:
-            self.save_videoId()
-            # JSON 파일 읽기
-            with open("data/videoId.json", "r", encoding="utf-8") as f:
-                video_ids = json.load(f)
-
-        for video_id in video_ids:
+        with open(self.PATH1, "r", encoding="utf-8") as f:
+            video_ids = json.load(f)
+        for video_id in video_ids[:self.count]:
             stats = self.statistics(video_id)
+            if stats is None:
+                continue
             videos_data.append(stats)
-
-            video_title, comments, like_counts = self.textDisplay(video_id)
-            comments_data.append({
-                'title': video_title, 
-                'video_id': video_id, 
-                'comments': comments,
-                'like_count': like_counts
-                })
+            print(stats)
+            data = self.textDisplay(video_id)
+            if data is None:
+                continue
+            comments_data.append(data)
+        if self.count != -1:
+            with open(self.PATH2, "r", encoding="utf-8") as f:
+                total_data = json.load(f)
+                videos_data = videos_data + total_data["video"][self.count:]
+                comments_data = comments_data + total_data["comments"][self.count:]
+                total_data = {"video" : videos_data, "comments" : comments_data}
+                with open(self.PATH2, "w", encoding="utf-8") as f:
+                    json.dump(total_data, f, ensure_ascii=False, indent=4)
+                    print("data json 파일 업데이트 완료")
+        else:
+            total_data = {"video" : videos_data, "comments" : comments_data}
+            with open(self.PATH2, "w", encoding="utf-8") as f:
+                json.dump(total_data, f, ensure_ascii=False, indent=4)
+                print(f"total data json 파일 저장 완료")
         df_videos = pd.DataFrame(videos_data)
         df_comments = pd.DataFrame(comments_data)
-
         return df_videos, df_comments
-    
-    def save_videoId(self, count=100):
-        request = self.youtube.search().list(
-            part="snippet",
-            channelId=self.channelID,
-            maxResults=count,
-            order="date"
-        )
-        video_ids = []
-        response = request.execute()
-        for item in response['items']:
-            if item['id']['kind'] == "youtube#video":
-                video_ids.append(item['id']['videoId'])
 
+    def save_videoId(self):
+        next_page_token = None
+        video_ids = []
+        for _ in range(8):
+            request = self.youtube.search().list(
+                part="snippet",
+                channelId=self.channelID,
+                maxResults=50,
+                order="date",
+                pageToken=next_page_token
+            )
+            response = request.execute()
+            for item in response['items']:
+                if item['id']['kind'] == "youtube#video":
+                    video_ids.append(item['id']['videoId'])
+            next_page_token = response.get("nextPageToken")
+            if not next_page_token:
+                break
         # JSON 파일로 저장
-        with open("data/videoId.json", "w", encoding="utf-8") as f:
+        with open(self.PATH1, "w", encoding="utf-8") as f:
             json.dump(video_ids, f, ensure_ascii=False, indent=4)
-            print("json 파일 저장 완료")
+            print(f"{len(video_ids)}개 data json 파일 저장 완료")
+
+if __name__=="__main__":
+    load_dotenv("data/.env.google")
+    api_key = os.getenv("api_key_update")
+    youtube_manager = YouTubeManager(
+        api_key=api_key, 
+        channelID="UCW945UjEs6Jm3rVNvPEALdg",
+        count=20
+        )
+    #youtube_manager.save_videoId()
+    youtube_manager.collect_data()
+
 
 
 

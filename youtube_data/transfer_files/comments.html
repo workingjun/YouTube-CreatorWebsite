@@ -79,7 +79,7 @@
             const videoId = urlParams.get('videoId');
 
             // comments_data.json 로드
-            fetch('./comments_data.json')
+            fetch("./comments_data.json")
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('JSON 파일을 불러올 수 없습니다. 상태 코드: ' + response.status);
@@ -97,6 +97,8 @@
                 })
                 .catch(error => {
                     console.error("댓글 데이터를 로드할 수 없습니다:", error);
+                    console.log("현재 videoId:", videoId);
+                    console.log("JSON 키들:", Object.keys(commentsData));
                     const commentsContainer = document.getElementById('comments-container');
                     commentsContainer.innerHTML = "<p>댓글 데이터를 불러오는 중 문제가 발생했습니다.</p>";
                 });

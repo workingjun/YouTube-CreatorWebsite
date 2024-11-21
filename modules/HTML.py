@@ -3,11 +3,15 @@ import math
 import json
 
 class HtmlManager:
+    PATH1 = "youtube_data/templates/template.html"
+    PATH2 = "youtube_data/transfer_files/index.html"
+    PATH3 = "youtube_data/transfer_files/comments_data.json"
+    
     def __init__(self, youtube_manager: YouTubeManager):
         self.youtube_manager = youtube_manager
         
     def load_template(self):
-        with open("data/templates/template.html", "r", encoding="utf-8") as file:
+        with open(self.PATH1, "r", encoding="utf-8") as file:
             template = file.read()
             template = template.replace("{", "{{").replace("}", "}}")
             template = template.replace("{{channel_name}}", "{channel_name}")
@@ -46,7 +50,7 @@ class HtmlManager:
             last_video_cards=last_video_cards,
             video_cards=video_cards
             )
-        with open("data/transfer_files/index.html", "w", encoding="utf-8") as file:
+        with open(self.PATH2, "w", encoding="utf-8") as file:
             file.write(html_output)
     
     def make_video_card(self, df_videos, count=-1):
@@ -54,7 +58,7 @@ class HtmlManager:
         df_videos['like_view_ratio'] = df_videos['like_count'] / df_videos['view_count']
 
         video_cards = ""
-        for idx, row in df_videos[:count].iterrows():
+        for _, row in df_videos[:count].iterrows():
             publish_time = row['publish_time'].replace("T", " ").replace("Z", "")
             view_count = format(row['view_count'], ",")
             like_count = format(row['like_count'], ",")
@@ -63,7 +67,7 @@ class HtmlManager:
             like_view_var = math.sqrt(row['view_count'] * row['like_count'])
 
             video_cards += f"""
-            <div class="video-card" data-default="{idx}" data-comments="{row['comment_count']} "data-views="{row['view_count']}" data-likes="{row['like_count']}" data-popular="{like_view_var}">
+            <div class="video-card" data-date="{publish_time}" data-comments="{row['comment_count']} "data-views="{row['view_count']}" data-likes="{row['like_count']}" data-popular="{like_view_var}">
                 <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" alt="{row['title']} 썸네일" class="thumbnail">
                 <h3><a href="comments.html?videoId={row['video_id']}">{row['title']}</a></h3>
                 <p><strong>조회수:</strong> {view_count}</p>
@@ -77,7 +81,7 @@ class HtmlManager:
         return video_cards
     
     def save_comments_to_file(self, df_comments):
-        comments_data = {}
+        comments_data={}
         for _, row in df_comments.iterrows():
             comments_html = ""
             for comment, like_count in zip(row["comments"], row["like_count"]):  # 상위 5개 댓글
@@ -87,16 +91,14 @@ class HtmlManager:
                     <span class="comment-likes">👍 {like_count} likes</span>
                 </div>
                 """
-            comments_data[row['video_id']] = f"""
+            comments_data[row["video_id"]] = f"""
             <div class="comment-container">
                 <h4 class="video-title">{row['title']}</h4>
-                <div class="comment-list">
-                {comments_html}
-                </div>    
+                <div class="comment-list">{comments_html}</div>    
             </div>
             """
         # JSON 파일로 저장
-        with open("data/transfer_files/comments_data.json", "w", encoding="utf-8") as f:
+        with open(self.PATH3, "w", encoding="utf-8") as f:
             json.dump(comments_data, f, ensure_ascii=False, indent=4)
 
         

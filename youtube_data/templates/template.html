@@ -293,7 +293,7 @@
                 <ul>
                     <li><a href="#channel-info">채널 정보</a></li>
                     <li><a href="#recent-videos">5일간 영상</a></li>
-                    <li><a href="#popular-videos">최근 영상</a></li>
+                    <li><a href="#popular-videos">채널 영상</a></li>
                 </ul>
             </nav>
         </header>
@@ -325,7 +325,7 @@
             <section class="content-section" id="popular-videos">
                 <div class="custom-dropdown">
                     <select id="sortCriteria" onchange="handleSortChange()">
-                        <option value="default">기본 정렬</option>
+                        <option value="date">날짜 순</option>
                         <option value="popular">최근 인기 순</option>
                         <option value="views">조회수 순</option>
                         <option value="likes">좋아요 순</option>
@@ -366,20 +366,27 @@
 
                 // 정렬
                 const sortedVideos = videos.sort((a, b) => {
-                    const valueA = Number(a.getAttribute(`data-${criteria}`));
-                    const valueB = Number(b.getAttribute(`data-${criteria}`));
-                    
-                    // 기준이 default일 때 오름차순 정렬
-                    if (criteria === 'default') {
-                        return valueA - valueB; // 오름차순
+                    if (criteria === 'date') {
+                        // 날짜 정렬: 내림차순
+                        const dateA = new Date(a.getAttribute('data-date')); // 'data-date' 속성에서 날짜 가져오기
+                        const dateB = new Date(b.getAttribute('data-date'));
+                        return dateB - dateA; // 최신 날짜가 먼저 오도록 정렬
+                    } else {
+                        // 다른 기준 정렬
+                        const valueA = Number(a.getAttribute(`data-${criteria}`));
+                        const valueB = Number(b.getAttribute(`data-${criteria}`));
+
+                        // 기준이 default일 때 오름차순 정렬
+                        if (criteria === 'default') {
+                            return valueA - valueB; // 오름차순
+                        }
+                        return valueB - valueA; // 내림차순
                     }
-                    return valueB - valueA; // 내림차순
                 });
 
                 // 정렬된 요소를 다시 추가
                 sortedVideos.forEach(video => container.appendChild(video));
             }
-
         </script>
     </body>
 </html>
