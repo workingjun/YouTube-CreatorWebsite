@@ -48,7 +48,7 @@ class Main:
                 youtube_manager = self.case2()
         html_manager = HtmlManager(youtube_manager)
         html_manager.save_index_to_file()
-        upload_files_to_ftp("ftpupload.net", "if0_37760205", "junhee1234", self.index_path, "/htdocs/")
+        upload_files_to_ftp("ftpupload.net", "if0_37760205", "", self.index_path, "/htdocs/")
 
 if __name__=="__main__":
     main = Main()
