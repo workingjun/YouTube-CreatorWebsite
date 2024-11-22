@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 class YouTubeManager:
 
     PATH1 = "youtube_data/videoId.json"
-    PATH2 = "youtube_data/total_data.json"
+    PATH2 = "youtube_data/vidoes_data.json"
+    PATH3 = "youtube_data/transfer_files/comments_data.json"
     
     def __init__(self, api_key, count=-1, channelID=None, channel_name=None):
         # YouTube API 설정
@@ -56,16 +57,6 @@ class YouTubeManager:
 
     def textDisplay(self, video_id):
         try:
-            # 동영상 정보 요청
-            video_request = self.youtube.videos().list(
-                part="snippet",
-                id=video_id  # 영상 ID
-            )
-            video_response = video_request.execute()
-
-            # 영상 제목 추출
-            video_title = video_response['items'][0]['snippet']['title']
-
             request = self.youtube.commentThreads().list(
                 part="snippet",
                 videoId=video_id,
@@ -75,21 +66,15 @@ class YouTubeManager:
             response = request.execute()
 
             # 댓글 정리
-            comments = []
-            like_counts = []
+            comments_data = []
             for item in response['items']:
                 comment = item['snippet']['topLevelComment']['snippet']
-                text = comment['textDisplay']
-                like_count = comment['likeCount']
-                text_clean = re.sub(r'<.*?>', '', text)
-                comments.append(text_clean)
-                like_counts.append(like_count)
-            return {
-                'title': video_title, 
-                'video_id': video_id, 
-                'comments': comments,
-                'like_count': like_counts
-                }
+                text = comment['textDisplay']  # 댓글 텍스트
+                like_count = comment['likeCount']  # 좋아요 수
+                author = comment['authorDisplayName']  # 작성자 이름
+                text_clean = re.sub(r'<.*?>', '', text)  # HTML 태그 제거
+                comments_data.append({"author":author,"text":text_clean,"like_count":like_count})  # 작성자 추가
+            return comments_data
         except:
             return None
         
@@ -113,7 +98,7 @@ class YouTubeManager:
 
     def collect_data(self):
         videos_data = []
-        comments_data = []
+        comments_data = {}
         with open(self.PATH1, "r", encoding="utf-8") as f:
             video_ids = json.load(f)
         for video_id in video_ids[:self.count]:
@@ -125,24 +110,36 @@ class YouTubeManager:
             data = self.textDisplay(video_id)
             if data is None:
                 continue
-            comments_data.append(data)
+            comments_data[f"{video_id}"] = data
         if self.count != -1:
-            with open(self.PATH2, "r", encoding="utf-8") as f:
-                total_data = json.load(f)
-                videos_data = videos_data + total_data["video"][self.count:]
-                comments_data = comments_data + total_data["comments"][self.count:]
-                total_data = {"video" : videos_data, "comments" : comments_data}
-                with open(self.PATH2, "w", encoding="utf-8") as f:
-                    json.dump(total_data, f, ensure_ascii=False, indent=4)
-                    print("data json 파일 업데이트 완료")
+             # PATH2 업데이트
+            with open(self.PATH2, "r+", encoding="utf-8") as f:
+                videos_data_prime = json.load(f)
+                videos_data = videos_data + videos_data_prime[self.count:]
+                f.seek(0)  # 파일 처음으로 이동
+                json.dump(videos_data, f, ensure_ascii=False, indent=4)
+                f.truncate()  # 파일 내용 자르기
+                print("videos data json 파일 업데이트 완료 (PATH2)")
+
+            # PATH3 업데이트
+            with open(self.PATH3, "r+", encoding="utf-8") as f:
+                comments_data_prime = json.load(f)
+                comments_data_prime.update(comments_data)  # 기존 데이터와 병합
+                f.seek(0)  # 파일 처음으로 이동
+                json.dump(comments_data_prime, f, ensure_ascii=False, indent=4)
+                f.truncate()  # 파일 내용 자르기
+                print("comments data json 파일 업데이트 완료 (PATH3)")
+
         else:
-            total_data = {"video" : videos_data, "comments" : comments_data}
             with open(self.PATH2, "w", encoding="utf-8") as f:
-                json.dump(total_data, f, ensure_ascii=False, indent=4)
-                print(f"total data json 파일 저장 완료")
+                json.dump(videos_data, f, ensure_ascii=False, indent=4)
+                print(f"videos data json 파일 저장 완료")
+            
+            with open(self.PATH3, "w", encoding="utf-8") as f:
+                json.dump(comments_data, f, ensure_ascii=False, indent=4)
+                print(f"comments data json 파일 저장 완료")
         df_videos = pd.DataFrame(videos_data)
-        df_comments = pd.DataFrame(comments_data)
-        return df_videos, df_comments
+        return df_videos
 
     def save_videoId(self):
         next_page_token = None
@@ -168,12 +165,12 @@ class YouTubeManager:
             print(f"{len(video_ids)}개 data json 파일 저장 완료")
 
 if __name__=="__main__":
-    load_dotenv("data/.env.google")
-    api_key = os.getenv("api_key_update")
+    load_dotenv("youtube_data/.env.google")
+    api_key = os.getenv("api_key_always")
     youtube_manager = YouTubeManager(
         api_key=api_key, 
         channelID="UCW945UjEs6Jm3rVNvPEALdg",
-        count=20
+        count=-1
         )
     #youtube_manager.save_videoId()
     youtube_manager.collect_data()

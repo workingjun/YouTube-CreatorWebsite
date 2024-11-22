@@ -28,11 +28,9 @@ class HtmlManager:
 
     def save_index_to_file(self):
         # 데이터 수집
-        df_videos, df_comments = self.youtube_manager.collect_data()
-        self.save_comments_to_file(df_comments)
+        df_videos = self.youtube_manager.collect_data()
         last_video_cards = self.make_video_card(df_videos, 5)
         video_cards = self.make_video_card(df_videos)
-
         result = self.youtube_manager.ChannelInformation()
         subscriber_count = format(result['subscriber_count'], ",")
         video_count = format(int(result['video_count']), ",")
@@ -67,9 +65,25 @@ class HtmlManager:
             like_view_var = math.sqrt(row['view_count'] * row['like_count'])
 
             video_cards += f"""
-            <div class="video-card" data-date="{publish_time}" data-comments="{row['comment_count']} "data-views="{row['view_count']}" data-likes="{row['like_count']}" data-popular="{like_view_var}">
-                <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" alt="{row['title']} 썸네일" class="thumbnail">
-                <h3><a href="comments.html?videoId={row['video_id']}">{row['title']}</a></h3>
+            <div class="video-card" 
+                data-date="{publish_time}" 
+                data-comments="{row['comment_count']}"
+                data-views="{row['view_count']}"
+                data-likes="{row['like_count']}"
+                data-popular="{like_view_var}"
+                data-video-id="{row['video_id']}">
+                <div class="thumbnail-container">
+                    <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" 
+                        alt="썸네일" 
+                        class="thumbnail">
+                    <div class="play-button">▶</div>
+                    <iframe 
+                        src=""
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen
+                        style="display: none;"></iframe>
+                </div>
+                <h3><a href="javascript:void(0)">{row['title']}</a></h3>
                 <p><strong>조회수:</strong> {view_count}</p>
                 <p><strong>좋아요 수:</strong> {like_count}</p>
                 <p><strong>댓글 수:</strong> {comment_count}</p>
@@ -79,26 +93,5 @@ class HtmlManager:
             </div>
             """
         return video_cards
-    
-    def save_comments_to_file(self, df_comments):
-        comments_data={}
-        for _, row in df_comments.iterrows():
-            comments_html = ""
-            for comment, like_count in zip(row["comments"], row["like_count"]):  # 상위 5개 댓글
-                comments_html += f"""
-                <div class="comment-card">
-                    <p class="comment-text">{comment}</p>
-                    <span class="comment-likes">👍 {like_count} likes</span>
-                </div>
-                """
-            comments_data[row["video_id"]] = f"""
-            <div class="comment-container">
-                <h4 class="video-title">{row['title']}</h4>
-                <div class="comment-list">{comments_html}</div>    
-            </div>
-            """
-        # JSON 파일로 저장
-        with open(self.PATH3, "w", encoding="utf-8") as f:
-            json.dump(comments_data, f, ensure_ascii=False, indent=4)
 
         
