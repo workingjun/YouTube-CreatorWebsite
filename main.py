@@ -43,12 +43,13 @@ class Main:
             else:
                 youtube_manager = self.case2()
         else:    
-            if current_time.hour == 19:
+            if current_time.hour == 18:
                 youtube_manager = self.case1()
             else:
                 youtube_manager = self.case2()
         html_manager = HtmlManager(youtube_manager)
         html_manager.save_index_to_file()
+
         upload_files_to_ftp("ftpupload.net", "if0_37760205", ftp_pw, self.index_path, "/htdocs/")
 
 if __name__=="__main__":
