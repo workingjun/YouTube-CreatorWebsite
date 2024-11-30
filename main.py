@@ -35,23 +35,26 @@ class Main:
 
     def run(self):
         current_time = datetime.now()
-        
+        load_dotenv(self.env_path)
+        ftp_pw = os.getenv("ftp_pw")
         if current_time.weekday() == 5 or current_time.weekday() == 6: 
             if current_time.hour == 13:
                 youtube_manager = self.case1()
             else:
                 youtube_manager = self.case2()
         else:    
-            if current_time.hour == 18:
+            if current_time.hour == 19:
                 youtube_manager = self.case1()
             else:
                 youtube_manager = self.case2()
         html_manager = HtmlManager(youtube_manager)
         html_manager.save_index_to_file()
-        upload_files_to_ftp("ftpupload.net", "if0_37760205", "junhee1234", self.index_path, "/htdocs/")
+        upload_files_to_ftp("ftpupload.net", "if0_37760205", ftp_pw, self.index_path, "/htdocs/")
 
 if __name__=="__main__":
     main = Main()
     main.run()
+
+    
     
     

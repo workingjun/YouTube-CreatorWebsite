@@ -10,7 +10,7 @@ class ChromeManager:
     user_data_dir = os.path.join(current_dir, 'chrometemp')
     OPTIONS = ["--remote-debugging-port=9221", f'--user-data-dir="{user_data_dir}"', "--no-first-run",
                "--no-default-browser-check", "--disable-extensions", "--disable-plugins", 
-               "--disable-infobars", "--headless"]
+               "--disable-infobars"]
 
     def __init__(self, url):
         self.chrome_process = None

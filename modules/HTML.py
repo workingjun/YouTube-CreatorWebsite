@@ -3,7 +3,7 @@ import math
 import json
 
 class HtmlManager:
-    PATH1 = "youtube_data/templates/template.html"
+    PATH1 = "youtube_data/template.html"
     PATH2 = "youtube_data/transfer_files/index.html"
     PATH3 = "youtube_data/transfer_files/comments_data.json"
     
@@ -77,11 +77,7 @@ class HtmlManager:
                         alt="썸네일" 
                         class="thumbnail">
                     <div class="play-button">▶</div>
-                    <iframe 
-                        src=""
-                        allow="autoplay; encrypted-media"
-                        allowfullscreen
-                        style="display: none;"></iframe>
+                    <iframe style="display: none;" frameborder="0" allowfullscreen></iframe>
                 </div>
                 <h3><a href="javascript:void(0)">{row['title']}</a></h3>
                 <p><strong>조회수:</strong> {view_count}</p>

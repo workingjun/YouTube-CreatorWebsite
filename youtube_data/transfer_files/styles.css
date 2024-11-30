@@ -1,0 +1,419 @@
+/* 기본 설정 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 계산 */
+}
+
+/* 기본 컨테이너 스타일 */
+.container {
+    width: 100%; /* 기본적으로 화면 전체를 채움 */
+    margin: 20px auto; /* 수직 중앙 정렬 및 수평 중앙 정렬 */
+    padding: 20px 30px; /* 내부 여백 */
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 메뉴 스타일 */
+.menu {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px 0;
+}
+
+.menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.menu ul li a {
+    text-decoration: none;
+    color: #007BFF;
+    font-weight: bold;
+    padding: 10px 15px; /* 클릭 영역 확장 */
+    border-radius: 5px; /* 버튼 느낌 추가 */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu ul li a.active {
+    color: #ffffff;          /* 활성화된 텍스트 색상 */
+    background-color: #007BFF; /* 활성화된 배경색 */
+    border-radius: 5px;      /* 둥근 모양 */
+}
+
+/* 채널 정보 스타일 */
+.channel-info {
+    text-align: center;
+    margin-bottom: 40px; /* 아래 여백 */
+}
+
+.channel-info img.thumbnail {
+    width: 120px;
+    height: auto;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.channel-info p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #333;
+}
+
+/* 카드 레이아웃 */
+.video-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* 카드 중앙 정렬 */
+    gap: 10px; /* 카드 간격 축소 */
+    padding: 0; /* 여백 제거 */
+}
+
+.video-card {
+    flex: 1 1 calc(100% - 20px); /* 기본 카드 크기 */
+    max-width: 100%; /* 카드 최대 너비 제한 해제 */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.video-card iframe {
+    width: 100%; /* 부모 폭 채우기 */
+    height: 400px; /* 기본 고정 높이 */
+    border: none;
+}
+
+.video-card:hover {
+    transform: translateY(-5px); /* 마우스 호버 시 살짝 위로 이동 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 카드 이미지와 텍스트 간 조화 */
+.video-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.video-card h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #007BFF;
+    overflow: hidden; /* 초과 텍스트 숨김 */
+    text-overflow: ellipsis; /* 말줄임표(...) 추가 */
+    display: -webkit-box; /* 웹킷 기반 브라우저 지원 */
+    -webkit-line-clamp: 2; /* 최대 두 줄까지만 표시 */
+    -webkit-box-orient: vertical; /* 수직 방향 설정 */
+    white-space: normal; /* 줄바꿈 허용 */
+}
+
+.video-card p {
+    font-size: 0.9em;
+    color: #555;
+    margin: 5px 0;
+}
+
+.custom-dropdown {
+    display: flex; /* 플렉스 컨테이너 설정 */
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-right: 20px; /* 컨테이너 오른쪽 여백 */
+    margin-bottom: 20px; /* 아래쪽 여백 추가 */
+    align-items: center; /* 수직 중앙 정렬 */
+    gap: 10px; /* 드롭다운과 다른 요소 간격 */
+    margin: 40px 20px 20px 20px; /* 위쪽 30px, 아래쪽 40px */
+}
+
+.custom-dropdown select {
+    padding: 10px 15px; /* 내부 여백 */
+    border-radius: 5px; /* 둥근 테두리 */
+    border: 1px solid #ddd; /* 기본 테두리 */
+    background-color: #f9f9f9; /* 드롭다운 배경 */
+    font-size: 16px; /* 글자 크기 */
+    color: #333; /* 텍스트 색상 */
+    cursor: pointer; /* 포인터로 표시 */
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease; /* 부드러운 전환 */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
+    outline: none; /* 클릭 시 테두리 제거 */
+}
+
+.custom-dropdown select:hover {
+    border-color: #007BFF; /* hover 시 강조된 테두리 색상 */
+    background-color: #f0f8ff; /* hover 시 배경색 약간 밝게 */
+}
+
+.custom-dropdown select:focus {
+    border-color: #0056b3; /* 클릭 시 테두리 강조 */
+    box-shadow: 0px 0px 8px rgba(0, 91, 187, 0.5); /* 클릭 시 외부 그림자 */
+    background-color: #e6f3ff; /* 클릭 시 배경색 */
+}
+
+.custom-dropdown select option {
+    color: #333; /* 옵션 텍스트 색상 */
+    background-color: #fff; /* 옵션 배경색 */
+    padding: 8px; /* 옵션 내부 여백 */
+}
+
+/* 흐린 배경 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 흐린 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 모달 창 */
+.modal-content {
+    background-color: #fff;
+    width: 80%;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    text-align: left;
+}
+
+/* 닫기 버튼 */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #007BFF;
+}
+
+/* 댓글 스타일 */
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-body .comment {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999; /* 항상 위에 표시되도록 설정 */
+    background: rgba(255, 255, 255, 0.8); /* 살짝 어두운 배경 */
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3; /* Light grey */
+    border-top: 4px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+  
+#links-section {
+    text-align: center;
+    margin: 20px;
+}
+
+/* 기본 설정 */
+.link-grid {
+    display: flex;
+    flex-direction: row; /* 기본적으로 가로 배치 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    flex-wrap: wrap; /* 필요 시 줄바꿈 */
+    gap: 15px; /* 간격 조정 */
+}
+
+/* 링크 아이템 */
+.link-item {
+    max-width: 250px; /* 최대 너비 제한 */
+    padding: 12px; /* 여백 증가 */
+    font-size: 14px; /* 텍스트 크기 */
+    gap: 8px; /* 아이콘과 텍스트 간격 조정 */
+    display: flex; /* 내부 정렬을 위한 Flexbox */
+    align-items: center; /* 아이콘과 텍스트 수직 정렬 */
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.link-item img {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+.link-item:hover {
+    background-color: #f0f8ff;
+    transform: scale(1.05); /* 호버 시 살짝 확대 */
+}
+
+.link-item span {
+    flex: 1; /* 텍스트를 남은 공간에 맞춤 */
+    font-weight: 500; /* 텍스트 두께 조정 */
+    text-align: left; /* 텍스트 정렬 */
+    color: #333;
+}
+
+/* 모바일 (768px 미만) */
+@media (max-width: 767px) {
+    .container {
+        max-width: 90%; /* 모바일에서 화면의 95%로 제한 */
+        padding: 10px 15px; /* 여백 축소 */
+    }
+
+    .video-card {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .video-card iframe {
+        display: none; /* 기본적으로 숨김 */
+        width: 100%;
+        height: 250px;
+        border: none;
+    }
+    
+    .video-card.playing {
+        position: fixed;
+        top: 0;
+        left: -3vw; /* 왼쪽으로 이동 */
+        width: 103vw;
+        height: 100vh;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .video-card.playing iframe {
+        display: block;
+        width: 105vw; /* 너비를 화면보다 넓게 설정 */
+        height: 30vh; /* 화면 높이의 30% 사용 */
+        border-radius: 10px;
+    }
+    
+    .video-card h3 {
+        font-size: 1em; /* 텍스트 크기를 줄임 */
+    }
+
+    .link-grid {
+        flex-direction: column; /* 모바일에서 수직 정렬로 변경 */
+        align-items: center; /* 수평 중앙 정렬 */
+        gap: 15px; /* 간격 유지 */
+    }
+
+    .link-item {
+        width: 100%; /* 전체 너비 사용 */
+        max-width: 300px; /* 최대 너비 제한 */
+    }
+
+    .link-item img {
+        width: 28px; /* 아이콘 크기 줄이기 */
+        height: 28px;
+    }
+}
+
+/* 반응형 스타일 */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .video-card {
+        flex: 1 1 calc(50% - 20px); /* 태블릿에서는 두 줄에 두 개 */
+        max-width: 300px; /* 카드 최대 너비 제한 해제 */
+    }
+
+    .video-card iframe {
+        height: 250px; /* 모바일에서 높이 더 감소 */
+    }
+
+    .video-card.active iframe {
+        height: 350px; /* 모바일에서 확대 재생 크기 조정 */
+    }
+
+    .menu ul {
+        gap: 15px; /* 태블릿 간격 */
+    }
+    .link-grid {
+        gap: 25px; /* 태블릿에서는 간격 약간 늘리기 */
+    }
+
+    .link-item {
+        padding: 14px 18px; /* 여백 약간 증가 */
+        font-size: 16px; /* 텍스트 크기 중간 크기로 설정 */
+        gap: 12px; /* 아이콘과 텍스트 간격 증가 */
+    }
+
+    .link-item img {
+        width: 30px; /* 태블릿용 아이콘 크기 */
+        height: 30px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    .video-card {
+        flex: 1 1 calc(20% - 20px); /* 데스크톱에서는 기본 5열 */
+        max-width: 350px; /* 카드 최대 너비 제한 해제 */
+    }
+
+    .video-card iframe {
+        height: 300px; /* 태블릿에서 높이 감소 */
+    }
+
+    .video-card.active iframe {
+        height: 400px; 
+    }
+}
