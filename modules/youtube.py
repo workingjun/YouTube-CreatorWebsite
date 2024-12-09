@@ -106,7 +106,7 @@ class YouTubeManager:
             if stats is None:
                 continue
             videos_data.append(stats)
-            print(stats)
+            #print(stats)
             data = self.textDisplay(video_id)
             if data is None:
                 continue
