@@ -1,6 +1,6 @@
 from modules.youtube import YouTubeManager
 import math 
-import json
+from datetime import datetime
 
 class HtmlManager:
     PATH1 = "youtube_data/template.html"
@@ -29,8 +29,8 @@ class HtmlManager:
     def save_index_to_file(self):
         # 데이터 수집
         df_videos = self.youtube_manager.collect_data()
-        last_video_cards = self.make_video_card(df_videos, 5)
-        video_cards = self.make_video_card(df_videos)
+        last_video_cards = self.make_video_card(df_videos, hidden=False)
+        video_cards = self.make_video_card(df_videos, start=5, stop=-1)
         result = self.youtube_manager.ChannelInformation()
         subscriber_count = format(result['subscriber_count'], ",")
         video_count = format(int(result['video_count']), ",")
@@ -51,27 +51,45 @@ class HtmlManager:
         with open(self.PATH2, "w", encoding="utf-8") as file:
             file.write(html_output)
     
-    def make_video_card(self, df_videos, count=-1):
+    def make_video_card(self, df_videos, start=0, stop=5, hidden=True):
         # 좋아요 대비 조회수 비율 계산    
         df_videos['like_view_ratio'] = df_videos['like_count'] / df_videos['view_count']
 
         video_cards = ""
-        for _, row in df_videos[:count].iterrows():
+        for _, row in df_videos[start:stop].iterrows():
             publish_time = row['publish_time'].replace("T", " ").replace("Z", "")
+            publish_time_list=list(publish_time)
+            previous_time = ''.join(publish_time_list[11:13])
+            plus_time = int(previous_time) + 9
+            publish_time_list[11:13] = str(plus_time)
+            publish_time = "".join(publish_time_list)
             view_count = format(row['view_count'], ",")
             like_count = format(row['like_count'], ",")
             comment_count = format(row['comment_count'], ",")
-            like_view_ratio = f"{(row['like_count'] / row['view_count']) * 100:.2f}%"
-            like_view_var = math.sqrt(row['view_count'] * row['like_count'])
+
+            given_time = datetime.strptime(publish_time, "%Y-%m-%d %H:%M:%S")
+            current_time = datetime.now()
+            time_difference = current_time - given_time
+            elapsed_hours = time_difference.total_seconds() / 3600  # 초를 시간으로 변환
+            Engagement_Rate = (row['comment_count'] + row['like_count']) / row['view_count']
+            half_life = 24*30  # 7일(168시간)을 반감기로 설정
+            trand_point = Engagement_Rate * math.exp(-elapsed_hours / half_life)
+
+            hidden_text = ""
+            if hidden:
+                hidden_text = "video-card hidden"
+            else:
+                hidden_text = "video-card-info"
 
             video_cards += f"""
-            <div class="video-card" 
+            <div class="{hidden_text}" 
                 data-date="{publish_time}" 
                 data-comments="{row['comment_count']}"
                 data-views="{row['view_count']}"
                 data-likes="{row['like_count']}"
-                data-popular="{like_view_var}"
-                data-video-id="{row['video_id']}">
+                data-trand="{trand_point}"
+                data-video-id="{row['video_id']}"
+                data-is-shorts="{row['is_shorts']}">
                 <div class="thumbnail-container">
                     <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" 
                         alt="썸네일" 
@@ -83,11 +101,8 @@ class HtmlManager:
                 <p><strong>조회수:</strong> {view_count}</p>
                 <p><strong>좋아요 수:</strong> {like_count}</p>
                 <p><strong>댓글 수:</strong> {comment_count}</p>
-                <p><strong>좋아요 대비 비율:</strong> {like_view_ratio}</p>
                 <p><strong>게시 시간:</strong> {publish_time}</p>
                 <a href="https://www.youtube.com/watch?v={row['video_id']}" target="_blank">동영상 보러가기</a>
             </div>
             """
         return video_cards
-
-        

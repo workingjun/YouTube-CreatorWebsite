@@ -81,6 +81,7 @@ body {
     padding: 0; /* 여백 제거 */
 }
 
+.video-card-info,
 .video-card {
     flex: 1 1 calc(100% - 20px); /* 기본 카드 크기 */
     max-width: 100%; /* 카드 최대 너비 제한 해제 */
@@ -97,18 +98,21 @@ body {
     align-items: center;
 }
 
+.video-card-info iframe,
 .video-card iframe {
     width: 100%; /* 부모 폭 채우기 */
     height: 400px; /* 기본 고정 높이 */
     border: none;
 }
 
+.video-card-info:hover,
 .video-card:hover {
     transform: translateY(-5px); /* 마우스 호버 시 살짝 위로 이동 */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* 카드 이미지와 텍스트 간 조화 */
+.video-card-info img,
 .video-card img {
     max-width: 100%;
     height: auto;
@@ -116,6 +120,7 @@ body {
     margin-bottom: 10px;
 }
 
+.video-card-info h3,
 .video-card h3 {
     font-size: 1.2em;
     margin-bottom: 10px;
@@ -128,6 +133,7 @@ body {
     white-space: normal; /* 줄바꿈 허용 */
 }
 
+.video-card-info p,
 .video-card p {
     font-size: 0.9em;
     color: #555;
@@ -200,6 +206,18 @@ body {
     text-align: left;
 }
 
+/* 댓글 스타일 */
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-body .comment {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
 /* 닫기 버튼 */
 .close {
     position: absolute;
@@ -215,25 +233,13 @@ body {
     color: #007BFF;
 }
 
-/* 댓글 스타일 */
-.modal-body {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.modal-body .comment {
-    margin-bottom: 15px;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
 #loading-spinner {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 9999; /* 항상 위에 표시되도록 설정 */
-    background: rgba(255, 255, 255, 0.8); /* 살짝 어두운 배경 */
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.6); /* 어두운 반투명 배경 */
     width: 100vw;
     height: 100vh;
     display: flex;
@@ -242,22 +248,90 @@ body {
 }
 
 .spinner {
-    border: 4px solid #f3f3f3; /* Light grey */
-    border-top: 4px solid #3498db; /* Blue */
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+
+.spinner::before,
+.spinner::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
+    animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.spinner::before {
+    border-top: 3px solid #3498db; /* Blue */
+    border-bottom: 3px solid #3498db; /* Blue */
+    animation-delay: 0s;
+}
+
+.spinner::after {
+    border-left: 3px solid #f1c40f; /* Yellow */
+    border-right: 3px solid #f1c40f; /* Yellow */
+    animation-delay: 0.75s;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
   
 #links-section {
     text-align: center;
     margin: 20px;
+}
+
+#loading {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.8); /* 어두운 반투명 배경 */
+    border-radius: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out, bounce 1s infinite ease-in-out;
+    z-index: 9999;
+    opacity: 0; /* 애니메이션 시작 전 */
+}
+
+/* 페이드 인 애니메이션 */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* 부드러운 위아래 움직임 애니메이션 */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+.hidden {
+    display: none; 
 }
 
 /* 기본 설정 */
@@ -312,18 +386,21 @@ body {
         padding: 10px 15px; /* 여백 축소 */
     }
 
+    .video-card-info, 
     .video-card {
         position: relative;
         transition: all 0.3s ease;
     }
-    
+
+    .video-card-info iframe,
     .video-card iframe {
         display: none; /* 기본적으로 숨김 */
         width: 100%;
         height: 250px;
         border: none;
     }
-    
+
+    .video-card-info.playing,
     .video-card.playing {
         position: fixed;
         top: 0;
@@ -337,6 +414,7 @@ body {
         justify-content: center;
     }
     
+    .video-card-info.playing iframe,
     .video-card.playing iframe {
         display: block;
         width: 105vw; /* 너비를 화면보다 넓게 설정 */
@@ -344,6 +422,7 @@ body {
         border-radius: 10px;
     }
     
+    .video-card-info h3,
     .video-card h3 {
         font-size: 1em; /* 텍스트 크기를 줄임 */
     }
@@ -367,15 +446,18 @@ body {
 
 /* 반응형 스타일 */
 @media (min-width: 768px) and (max-width: 1023px) {
+    .video-card-info,
     .video-card {
         flex: 1 1 calc(50% - 20px); /* 태블릿에서는 두 줄에 두 개 */
         max-width: 300px; /* 카드 최대 너비 제한 해제 */
     }
 
+    .video-card-info iframe,
     .video-card iframe {
         height: 250px; /* 모바일에서 높이 더 감소 */
     }
 
+    .video-card-info.active iframe,
     .video-card.active iframe {
         height: 350px; /* 모바일에서 확대 재생 크기 조정 */
     }
@@ -404,15 +486,18 @@ body {
         max-width: 1400px;
     }
 
+    .video-card-info,
     .video-card {
         flex: 1 1 calc(20% - 20px); /* 데스크톱에서는 기본 5열 */
         max-width: 350px; /* 카드 최대 너비 제한 해제 */
     }
 
+    .video-card-info iframe,
     .video-card iframe {
         height: 300px; /* 태블릿에서 높이 감소 */
     }
 
+    .video-card-info.active iframe,
     .video-card.active iframe {
         height: 400px; 
     }

@@ -80,20 +80,41 @@ class YouTubeManager:
         
     def statistics(self, video_id): 
         request = self.youtube.videos().list(
-            part="snippet,statistics",
+            part="snippet,contentDetails,statistics",
             id=video_id
         )
         response = request.execute()
         for item in response['items']:
             if 'viewCount' not in item['statistics']:
                 return None
+            # 비디오 ID 가져오기
+            video_id = item.get('id', 'Unknown ID')
+            # contentDetails에서 duration 가져오기
+            duration = item.get("contentDetails", {}).get("duration", "")
+            # 숏츠 판별 초기화
+            is_short = 0
+            # ISO 8601 형식에서 시간, 분, 초 추출
+            match = re.match(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", duration)
+            if match:
+                # 시간(H), 분(M), 초(S)을 추출 (없으면 0)
+                hours = int(match.group(1) or 0)
+                minutes = int(match.group(2) or 0)
+                seconds = int(match.group(3) or 0)
+                # 총 길이를 초 단위로 계산
+                total_seconds = hours * 3600 + minutes * 60 + seconds
+                # 숏츠 조건: 길이가 60초 이하
+                if total_seconds <= 60:
+                    is_short = 1
+            # 결과 출력
+            print(f"Is Shorts = {is_short}, Duration = {duration}, total_seconds={total_seconds}")        
             return {
                 'video_id': video_id,
                 'title': item['snippet']['localized']['title'],
                 'view_count': int(item['statistics']['viewCount']),
                 'like_count': int(item['statistics'].get('likeCount', 0)),
                 'comment_count': int(item['statistics'].get('commentCount', 0)),
-                'publish_time': item['snippet']['publishedAt']
+                'publish_time': item['snippet']['publishedAt'],
+                'is_shorts': is_short
             }
 
     def collect_data(self):
