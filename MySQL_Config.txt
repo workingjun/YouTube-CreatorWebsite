@@ -1,0 +1,89 @@
+cd C:\Program Files\MySQL\MySQL Server 8.0\bin
+
+mysql -u root -p --port=666
+mysql -u everytime -p --port=666
+
+CREATE USER 'youtube'@'%' IDENTIFIED BY '2483';
+
+GRANT ALL PRIVILEGES ON *.* TO 'youtube'@'%' WITH GRANT OPTION;
+WITH GRANT OPTION은 root 계정이 다른 사용자에게도 권한을 부여할 수 있도록 허용합니다.
+
+GRANT ALL PRIVILEGES ON *.* TO 'youtube'@'%';
+
+CREATE DATABASE youtubeDATA;
+
+GRANT ALL PRIVILEGES ON youtubeDATA.* TO 'youtube'@'%';
+
+USE youtubeDATA;
+CREATE TABLE comments (
+    video_id VARCHAR(255) NOT NULL, 
+    author VARCHAR(255) NOT NULL, 
+    text TEXT NOT NULL, 
+    like_count INT NOT NULL, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE videoId (
+    video_id VARCHAR(255) NOT NULL, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE videoData (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    video_id VARCHAR(255) NOT NULL,
+    title TEXT NOT NULL,
+    view_count INT NOT NULL,
+    like_count INT NOT NULL,
+    comment_count INT NOT NULL,
+    publish_time DATETIME NOT NULL,
+    is_shorts BOOLEAN NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+
+
+
+
+CREATE TABLE ErrorLogs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp DATETIME,
+    error_type VARCHAR(50), 
+    message TEXT,          
+);
+
+
+CREATE TABLE ProgressLogs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp DATETIME,
+    process_name VARCHAR(100), 
+    step_name VARCHAR(100),    
+    status VARCHAR(50),        
+    details TEXT              
+);
+
+CREATE TABLE Logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    timestamp DATETIME,
+    log_type ENUM('Error', 'Progress'), -- 로그 유형 (에러/진행)
+    log_level VARCHAR(50),             -- 로그 수준 (INFO, WARNING, ERROR)
+    category VARCHAR(50),              -- 로그 카테고리 (예: Database, Training)
+    message TEXT,                      -- 메시지 내용
+    extra_data JSON                    -- 추가 데이터 (예: 에러 코드, 진행 정보 등)
+);
+
+ALTER TABLE videoid
+ADD CONSTRAINT unique_video_id UNIQUE (video_id);
+
+SET @new_id = 0;
+
+UPDATE videoid
+SET id = (@new_id := @new_id + 1)
+ORDER BY id ASC;
+
+ALTER TABLE videoid AUTO_INCREMENT = 1;
+
+FLUSH PRIVILEGES;
+
+TRUNCATE TABLE logs;
