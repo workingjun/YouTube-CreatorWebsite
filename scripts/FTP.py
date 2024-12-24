@@ -1,45 +1,60 @@
 import os
 from ftplib import FTP
+from threading import Thread
 
-def upload_files_to_ftp(ftp_server, ftp_user, ftp_password, directory_path, upload_dir):
-    """
-    디렉토리 내 모든 파일을 FTP 서버에 업로드
-    :param ftp_server: FTP 서버 주소 (예: 'ftp.example.com')
-    :param ftp_user: FTP 사용자명
-    :param ftp_password: FTP 비밀번호
-    :param directory_path: 업로드할 로컬 디렉토리 경로
-    :param upload_dir: FTP 서버의 업로드 디렉토리 경로
-    """
-    try:
-        # 디렉토리에서 모든 파일 경로 가져오기
-        file_paths = [
-            os.path.join(directory_path, file_name)
-            for file_name in os.listdir(directory_path)
-            if os.path.isfile(os.path.join(directory_path, file_name))
-        ]
+class FTPmanager:
+    def __init__(self, ftp_server, ftp_user, ftp_password):
+        self.ftp_server = ftp_server
+        self.ftp_user = ftp_user
+        self.ftp_password = ftp_password
 
-        if not file_paths:
-            print("업로드할 파일이 없습니다.")
-            return
+    def connect_ftp(self):
+        ftp = FTP(self.ftp_server)
+        ftp.login(user=self.ftp_user, passwd=self.ftp_password)
+        return ftp
 
-        # FTP 연결
-        ftp = FTP(ftp_server)
-        ftp.login(user=ftp_user, passwd=ftp_password)
-        print("FTP 연결 성공!")
+    def upload_file(self, local_path, remote_path):
+        try:
+            ftp = self.connect_ftp()
+            with open(local_path, "rb") as file:
+                ftp.storbinary(f"STOR {remote_path}", file)
+            print(f"파일 업로드 성공: {local_path} -> {remote_path}")
+        except Exception as e:
+            print(f"파일 업로드 실패: {local_path}, 오류: {e}")
+        finally:
+            ftp.quit()
 
-        # 파일 전송
-        for file_path in file_paths:
-            try:
-                file_name = os.path.basename(file_path)  # 파일 이름 추출
-                upload_path = f"{upload_dir}/{file_name}"  # 업로드 경로 생성
-                with open(file_path, "rb") as file:
-                    ftp.storbinary(f"STOR {upload_path}", file)
-                print(f"파일 업로드 성공: {file_name} -> {upload_path}")
-            except Exception as file_error:
-                print(f"파일 업로드 중 오류 발생: {file_path}, 오류: {file_error}")
+    def upload_directory(self, local_path, remote_path):
+        # 원격 디렉토리 생성
+        ftp = self.connect_ftp()
+        try:
+            ftp.mkd(remote_path)
+            print(f"디렉터리 생성: {remote_path}")
+        except Exception:
+            print(f"디렉터리 이미 존재 또는 생성 오류: {remote_path}")
+        finally:
+            ftp.quit()
 
-        # FTP 연결 종료
-        ftp.quit()
-        print("FTP 연결 종료.")
-    except Exception as e:
-        print(f"FTP 연결 중 오류 발생: {e}")
+        threads = []
+
+        # 로컬 디렉터리의 모든 항목 탐색
+        for item in os.listdir(local_path):
+            local_item_path = os.path.join(local_path, item)
+            remote_item_path = f"{remote_path}/{item}"
+
+            if os.path.isfile(local_item_path):
+                # 파일 업로드를 별도의 스레드로 실행
+                thread = Thread(target=self.upload_file, args=(local_item_path, remote_item_path))
+                thread.start()
+                threads.append(thread)
+            elif os.path.isdir(local_item_path):
+                # 디렉토리 업로드는 재귀적으로 호출
+                self.upload_directory(local_item_path, remote_item_path)
+
+        # 모든 스레드가 완료될 때까지 대기
+        for thread in threads:
+            thread.join()
+
+    def upload_to_ftp(self, directory_path, upload_dir):
+        self.upload_directory(directory_path, upload_dir)
+        print("모든 파일 업로드 완료!")

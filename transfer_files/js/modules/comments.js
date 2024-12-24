@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingSpinner.style.display = 'flex';
 
             try {
-                // 댓글 데이터 가져오기 (서버 API 호출)
-                const response = await fetch(`http://localhost:3000/comments/${videoId}`);
+                // 댓글 데이터 가져오기 (PHP API 호출)
+                const response = await fetch(`http://friendshiping.ct.ws/js/modules/comments.php?videoId=${videoId}`);
                 const comments = await response.json();
 
                 // 댓글 모달 생성
@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 댓글 모달 생성 함수
     function showCommentsModal(videoId, comments) {
-        // 모달 초기화
         let modal = document.getElementById('comments-modal');
         if (!modal) {
             modal = document.createElement('div');
@@ -50,10 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.appendChild(modal);
         }
 
-        // 모달 내용 초기화
         modal.innerHTML = `
             <div style="position: relative; background: white; padding: 20px; border-radius: 10px; max-width: 600px; max-height: 80%; overflow-y: auto;">
-                <!-- X 버튼 추가 -->
                 <button style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer;" onclick="closeCommentsModal()">×</button>
                 ${comments.length === 0 ? '<p>댓글이 없습니다.</p>' : `
                     <ul>
@@ -72,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
         modal.style.display = 'flex'; // 모달 표시
     }
 
-    // 모달 닫기 함수
     function closeCommentsModal() {
         const modal = document.getElementById('comments-modal');
         if (modal) modal.style.display = 'none';

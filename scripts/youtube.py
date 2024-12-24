@@ -1,16 +1,12 @@
 import pandas as pd
 from googleapiclient.discovery import build
-import re, json, os
+import re, os
 from dotenv import load_dotenv
+from scripts.DataBase import DatabaseManager
+from datetime import datetime
 
 class YouTubeManager:
-
-    PATH1 = "youtube_data/videoId.json"
-    PATH2 = "youtube_data/vidoes_data.json"
-    PATH3 = "youtube_data/transfer_files/comments_data.json"
-    
     def __init__(self, api_key, count=-1, channelID=None, channel_name=None):
-        # YouTube API 설정
         self.youtube = build("youtube", "v3", developerKey=api_key)
         self.channel_name = channel_name
         if channelID is not None:
@@ -87,85 +83,75 @@ class YouTubeManager:
         for item in response['items']:
             if 'viewCount' not in item['statistics']:
                 return None
-            # 비디오 ID 가져오기
             video_id = item.get('id', 'Unknown ID')
-            # contentDetails에서 duration 가져오기
             duration = item.get("contentDetails", {}).get("duration", "")
-            # 숏츠 판별 초기화
             is_short = 0
-            # ISO 8601 형식에서 시간, 분, 초 추출
             match = re.match(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", duration)
             if match:
-                # 시간(H), 분(M), 초(S)을 추출 (없으면 0)
                 hours = int(match.group(1) or 0)
                 minutes = int(match.group(2) or 0)
                 seconds = int(match.group(3) or 0)
-                # 총 길이를 초 단위로 계산
                 total_seconds = hours * 3600 + minutes * 60 + seconds
-                # 숏츠 조건: 길이가 60초 이하
                 if total_seconds <= 60:
                     is_short = 1
-            # 결과 출력
-            print(f"Is Shorts = {is_short}, Duration = {duration}, total_seconds={total_seconds}")        
+            # print(f"Is Shorts = {is_short}, Duration = {duration}, total_seconds={total_seconds}")  
+            publish_time = item['snippet']['publishedAt'].replace("T", " ").replace("Z", "")
+            publish_time_list=list(publish_time)
+            previous_time = ''.join(publish_time_list[11:13])
+            plus_time = int(previous_time) + 9
+            publish_time_list[11:13] = str(plus_time)
+            publish_time = "".join(publish_time_list)  
+            publish_time = datetime.strptime(publish_time, "%Y-%m-%d %H:%M:%S")    
             return {
                 'video_id': video_id,
                 'title': item['snippet']['localized']['title'],
                 'view_count': int(item['statistics']['viewCount']),
                 'like_count': int(item['statistics'].get('likeCount', 0)),
                 'comment_count': int(item['statistics'].get('commentCount', 0)),
-                'publish_time': item['snippet']['publishedAt'],
+                'publish_time': publish_time,
                 'is_shorts': is_short
             }
-
-    def collect_data(self):
+    
+    def collect_data(self, db_manager: DatabaseManager):
         videos_data = []
         comments_data = {}
-        with open(self.PATH1, "r", encoding="utf-8") as f:
-            video_ids = json.load(f)
+        try:
+            db_manager.cursor.execute("SELECT video_id FROM videoId")
+            video_ids = [row[0] for row in db_manager.cursor.fetchall()]
+        except Exception as e:
+            print(f"[Error] Failed to fetch video IDs from database: {e}")
+            return
         for video_id in video_ids[:self.count]:
             stats = self.statistics(video_id)
             if stats is None:
                 continue
             videos_data.append(stats)
-            #print(stats)
+            db_manager.upsert_videodata(
+                video_id=stats['video_id'],
+                title=stats['title'],
+                view_count=stats['view_count'],
+                like_count=stats['like_count'],
+                comment_count=stats['comment_count'],
+                publish_time=stats['publish_time'],
+                is_shorts=stats['is_shorts']
+            )
             data = self.textDisplay(video_id)
             if data is None:
                 continue
             comments_data[f"{video_id}"] = data
-        if self.count != -1:
-             # PATH2 업데이트
-            with open(self.PATH2, "r+", encoding="utf-8") as f:
-                videos_data_prime = json.load(f)
-                videos_data = videos_data + videos_data_prime[self.count:]
-                f.seek(0)  # 파일 처음으로 이동
-                json.dump(videos_data, f, ensure_ascii=False, indent=4)
-                f.truncate()  # 파일 내용 자르기
-                print("videos data json 파일 업데이트 완료 (PATH2)")
+            for comment in data:
+                db_manager.upsert_comments(
+                    video_id=video_id,
+                    author=comment['author'],
+                    text=comment['text'],
+                    like_count=comment['like_count']
+                )
+        return video_ids[:self.count]
 
-            # PATH3 업데이트
-            with open(self.PATH3, "r+", encoding="utf-8") as f:
-                comments_data_prime = json.load(f)
-                comments_data_prime.update(comments_data)  # 기존 데이터와 병합
-                f.seek(0)  # 파일 처음으로 이동
-                json.dump(comments_data_prime, f, ensure_ascii=False, indent=4)
-                f.truncate()  # 파일 내용 자르기
-                print("comments data json 파일 업데이트 완료 (PATH3)")
-
-        else:
-            with open(self.PATH2, "w", encoding="utf-8") as f:
-                json.dump(videos_data, f, ensure_ascii=False, indent=4)
-                print(f"videos data json 파일 저장 완료")
-            
-            with open(self.PATH3, "w", encoding="utf-8") as f:
-                json.dump(comments_data, f, ensure_ascii=False, indent=4)
-                print(f"comments data json 파일 저장 완료")
-        df_videos = pd.DataFrame(videos_data)
-        return df_videos
-
-    def save_videoId(self):
+    def save_videoId(self, page, db_manager: DatabaseManager):
         next_page_token = None
         video_ids = []
-        for _ in range(8):
+        for _ in range(page):
             request = self.youtube.search().list(
                 part="snippet",
                 channelId=self.channelID,
@@ -180,14 +166,53 @@ class YouTubeManager:
             next_page_token = response.get("nextPageToken")
             if not next_page_token:
                 break
-        # JSON 파일로 저장
-        with open(self.PATH1, "w", encoding="utf-8") as f:
-            json.dump(video_ids, f, ensure_ascii=False, indent=4)
-            print(f"{len(video_ids)}개 data json 파일 저장 완료")
+        for video_id in video_ids[:self.count]:
+            db_manager.upsert_videoId(video_id)
+            
+    def get_all_playlists(self):
+        next_page_token = None
+        playlists = []
+        while True:
+            request = self.youtube.playlists().list(
+                part="snippet",
+                channelId=self.channelID,
+                maxResults=10,  # 한 번에 최대 50개
+                pageToken=next_page_token
+            )
+            response = request.execute()
+            # 재생목록 정보를 리스트에 추가
+            for item in response['items']:
+                playlists.append(item["id"])
+            # 다음 페이지 토큰
+            next_page_token = response.get("nextPageToken")
+            if not next_page_token:
+                break
+        return playlists
+
+    def save_videoId_from_playlist(self, db_manager: DatabaseManager):
+        playlist_ids = self.get_all_playlists()  # 업로드 재생목록 ID 가져오기
+        next_page_token = None
+        video_ids = []
+        for playlist_id in playlist_ids:
+            while True:
+                request = self.youtube.playlistItems().list(
+                    part="snippet",
+                    playlistId=playlist_id,
+                    maxResults=50,
+                    pageToken=next_page_token
+                )
+                response = request.execute()
+                for item in response['items']:
+                    video_ids.append(item['snippet']['resourceId']['videoId'])
+                next_page_token = response.get("nextPageToken")
+                if not next_page_token:
+                    break
+        for video_id in video_ids[:self.count]:
+            db_manager.upsert_videoId(video_id)
 
 if __name__=="__main__":
-    load_dotenv("youtube_data/.env.google")
-    api_key = os.getenv("api_key_always")
+    load_dotenv("secrets/.env.google")
+    api_key = os.getenv("api_key1")
     youtube_manager = YouTubeManager(
         api_key=api_key, 
         channelID="UCW945UjEs6Jm3rVNvPEALdg",

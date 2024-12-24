@@ -1,5 +1,5 @@
 // JSON 파일 경로
-const jsonFilePath = 'link_data.json';
+const jsonFilePath = './js/data/link_data.json';
 
 // JSON 파일 가져오기 및 렌더링
 async function loadLinks() {
