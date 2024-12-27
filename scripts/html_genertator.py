@@ -1,51 +1,38 @@
-from scripts.youtube import YouTubeManager
-from DB.database import 
-from scripts.utils import load_template
-import math 
+from scripts.utils.utils import load_template
+from DB.database import CommentDataManager, CombinedDataManager, VideoIdManager
+from scripts.youtubeAPI.api_manager import YoutubeApiManager
+from scripts.utils.utils import DBManager
 from datetime import datetime
+import math 
 
 class HTMLGenerator:
-    def __init__(self, youtube_manager: YouTubeManager):
-        self.youtube_manager = youtube_manager
+    def __init__(self):
         self.output_path = "transfer_files/index.html"
-    
-    def save_index_to_file(self, db_manager: DatabaseManager):
-        last_video_cards = self.make_video_card(db_manager=db_manager, hidden=False)
-        video_cards = self.make_video_card(db_manager=db_manager, start=5, stop=-1)
-        result = self.youtube_manager.ChannelInformation()
-        subscriber_count = format(result['subscriber_count'], ",")
-        video_count = format(int(result['video_count']), ",")
-        views_count = format(int(result['views_count']), ",")
+        self.db_manager = DBManager(
+            Comments=CommentDataManager(),
+            VideoId=VideoIdManager(),
+            Combine=CombinedDataManager()
+        )
+
+    def save_index_to_file(self, api_manager: YoutubeApiManager):
+        last_video_cards = self.make_video_card(hidden=False)
+        video_cards = self.make_video_card(start=5, stop=-1)
         self.template = load_template()
         html_output = self.template.format(
-            channel_name=result['title'],
-            channelID=result['channelID'],
-            thumbnail=result['thumbnail'],
-            description=result['description'],
-            video_count=video_count,
-            views_count=views_count,
-            subscriber_count=subscriber_count,
             last_video_cards=last_video_cards,
             video_cards=video_cards
             )
         with open(self.output_path, "w", encoding="utf-8") as file:
             file.write(html_output)
 
-    def make_video_card(self, db_manager: DatabaseManager, start=0, stop=5, hidden=True):
+    def make_video_card(self, start=0, stop=5, hidden=True):
         # Fetch video data
-        df_videos = db_manager.fetch_all_videodata()
-        video_Ids = self.youtube_manager.collect_data(db_manager=db_manager)
+        df_videos = self.db_manager.Combine.fetch_all_videoData()
         video_cards_list = []  # HTML 조각을 저장할 리스트
-
-        #for video_id in video_Ids:
-        #    for row in df_videos:
-        #        if df_videos["video_id"] == video_id:
-
-        # Define card visibility class
         hidden_text = "video-card hidden" if hidden else "video-card-info"
 
         # Generate video cards
-        for row in df_videos:
+        for row in df_videos[start:stop]:
             # Calculate engagement metrics
             publish_time = row['publish_time']
             view_count = format(row['view_count'], ",")

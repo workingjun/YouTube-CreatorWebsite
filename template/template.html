@@ -22,19 +22,19 @@
             <div class="channel-info" id="channel-info">
                 <h2>채널 정보</h2>
                 <p>
-                    <a href="https://www.youtube.com/channel/{channelID}" target="_blank">
-                        <img src="{thumbnail}" alt="채널 썸네일" class="thumbnail">
+                    <a id="channel-link" href="#" target="_blank">
+                        <img id="channel-thumbnail" src="" alt="채널 썸네일" class="thumbnail">
                     </a>
                 </p>
-                <p>채널 이름: <strong>{channel_name}</strong></p>
-                <p>구독자 수: <strong>{subscriber_count}</strong></p>
-                <p>채널 설명: <strong>{description}</strong></p>
-                <p>전체 조회 수: <strong>{views_count}</strong></p>
-                <p>동영상 수: <strong>{video_count}</strong></p>
+                <p>채널 이름: <strong id="channel-name"></strong></p>
+                <p>구독자 수: <strong id="subscriber-count"></strong></p>
+                <p>채널 설명: <strong id="channel-description"></strong></p>
+                <p>전체 조회 수: <strong id="views-count"></strong></p>
+                <p>동영상 수: <strong id="video-count"></strong></p>
                 <div id="links-section">
                     <h3>링크</h3>
                     <div id="link-list" class="link-grid"></div>
-                </div>           
+                </div>
             </div>
         
             <!-- 최근 동영상 조회 결과 -->

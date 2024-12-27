@@ -1,15 +1,11 @@
 from DB.database import CommentDataManager, CombinedDataManager, VideoIdManager
-from youtube.api_manager import YoutubeApiManager
-from dataclasses import dataclass
-
-@dataclass
-class DBManager:
-    Comments: CommentDataManager
-    VideoId: VideoIdManager
-    Combine: CombinedDataManager
+from scripts.youtubeAPI.api_manager import YoutubeApiManager
+from scripts.utils.utils import DBManager
+import json
 
 class YouTubeManager:
     def __init__(self, api_key, channelID=None, channel_name=None, finish_all_video_ids:bool=False):
+        self.ChannelInfo_filepath = "./json/ChannelInfo.json"
         self.count = -1 if finish_all_video_ids else 5
         self.api_manager = YoutubeApiManager(
             api_key=api_key, 
@@ -25,7 +21,7 @@ class YouTubeManager:
     def collect_data(self):
         video_ids = [row["video_id"] for row in self.db_manager.VideoId.fetch_videoIds()]
         for video_id in video_ids[:self.count]:
-            stats = self.api_manager.statistics(video_id)
+            stats = self.api_manager.get_video_statistics(video_id)
             if stats is None:
                 continue
             self.db_manager.VideoId.upsert_videoId(
@@ -37,7 +33,7 @@ class YouTubeManager:
                 publish_time=stats['publish_time'],
                 is_shorts=stats['is_shorts']
             )
-            data = self.api_manager.textDisplay(video_id)
+            data = self.api_manager.get_comments(video_id)
             if data is None:
                 continue
             for comment in data:
@@ -48,3 +44,8 @@ class YouTubeManager:
                     like_count=comment['like_count']
                 )
         return video_ids[:self.count]
+    
+    def save_channel_information(self):
+        result = self.api_manager.get_channel_information()
+        with open(self.ChannelInfo_filepath, "w", encoding="utf-8") as file:
+            json.dump(result, file, ensure_ascii=False, indent=4)

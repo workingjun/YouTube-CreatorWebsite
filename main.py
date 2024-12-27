@@ -1,8 +1,7 @@
 from config.api_config import api_key
 from datetime import datetime
-from scripts.youtube import YouTubeManager
-from scripts.html_genertator import HtmlManager
-from DB.DataBase import DatabaseManager
+from scripts.youtubeAPI import YoutubeApiManager
+from scripts.html_genertator import HTMLGenerator
 
 class YOUTUBECreatorWebsite:
     def __init__(self, channelID, index_path, remote_path, api_key):
@@ -10,7 +9,6 @@ class YOUTUBECreatorWebsite:
         self.api_key = api_key
         self.index_path = index_path
         self.remote_path = remote_path
-        self.db_manager = DatabaseManager()
 
     def get_youtube_manager(self, count=5, flags=False):
         if flags:
@@ -33,8 +31,8 @@ class YOUTUBECreatorWebsite:
             youtube_manager = self.get_youtube_manager()
 
         # HTML 생성 및 저장
-        html_manager = HtmlManager(youtube_manager)
-        html_manager.save_files(db_manager=self.db_manager)
+        html_manager = HTMLGenerator()
+        html_manager.save_index_to_file(api_manager=)
 
 if __name__ == "__main__":
     # Main 클래스 실행

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from DB.DataBase import DatabaseManager
+from DB.database import CommentDataManager
 
-db_manager = DatabaseManager()
+db_manager = CommentDataManager()
 comments_bp = Blueprint('comments', __name__)
 
 @comments_bp.route('/comments', methods=['GET'])

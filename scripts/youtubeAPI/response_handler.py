@@ -1,5 +1,5 @@
 import re
-from scripts.youtube.utils import is_short_video, transform_datetime
+from scripts.utils.utils import is_short_video, transform_datetime
 
 class YouTubeResponseHandler:
     @staticmethod
@@ -42,22 +42,6 @@ class YouTubeResponseHandler:
             "video_count": int(channel_info["statistics"]["videoCount"]),
             "views_count": int(channel_info["statistics"]["viewCount"]),
         }
-
-    @staticmethod
-    def _parse_comments(response, video_id):
-        try:
-            # 댓글 정리
-            comments_data = []
-            for item in response['items']:
-                comment = item['snippet']['topLevelComment']['snippet']
-                text = comment['textDisplay']  # 댓글 텍스트
-                like_count = comment['likeCount']  # 좋아요 수
-                author = comment['authorDisplayName']  # 작성자 이름
-                  # HTML 태그 제거
-                comments_data.append({"author":author,"text":text_clean,"like_count":like_count})  # 작성자 추가
-            return comments_data
-        except:
-            return None
         
     @staticmethod
     def _parse_comments(response):

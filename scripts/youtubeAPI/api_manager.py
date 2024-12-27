@@ -1,10 +1,5 @@
 from googleapiclient.discovery import build
-import re
-from datetime import datetime
-from config.api_config import api_key
-from DB.DataBase import CommentDataManager, CombinedDataManager, VideoIdManager, VideoDataManager
-from dataclasses import dataclasss
-from scripts.youtube.response_handler import YouTubeResponseHandler 
+from scripts.youtubeAPI.response_handler import YouTubeResponseHandler 
 
 class YoutubeApiManager:
     def __init__(self, api_key, channelID=None, channel_name=None):
@@ -44,12 +39,12 @@ class YoutubeApiManager:
 
     def get_videoIds(self):
         return self.fetch_response(
-                "search.Idlist",
-                part="snippet",
-                channelId=self.channelID,
-                maxResults=10,
-                order="date",
-            )
+            "search.Idlist",
+            part="snippet",
+            channelId=self.channelID,
+            maxResults=10,
+            order="date",
+        )
     
     def get_channel_id_by_name(self):
         return self.fetch_response(

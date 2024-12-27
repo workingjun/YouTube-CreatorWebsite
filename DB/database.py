@@ -1,7 +1,5 @@
 import mysql.connector
-import json
-from datetime import datetime  
-from config.api_config import db_config
+from config.db_config import db_config
 
 class BaseDatabaseManager:
     """공통 데이터베이스 작업을 관리하는 부모 클래스"""
