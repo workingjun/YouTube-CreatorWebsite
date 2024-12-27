@@ -1,4 +1,4 @@
 __pycache__/
 modules/__pycache__/
-secrets/
-transfer_files/index.html
+config/
+template/index.html

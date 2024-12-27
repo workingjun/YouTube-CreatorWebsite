@@ -1,11 +1,10 @@
-import './modules/menu.js';
-import './modules/menu_click.js';
-import './modules/sorting.js';
-import './modules/play.js';
-import './modules/comments.js';
-import './modules/loading.js';
+import './components/menu.js';
+import './utils/sorting.js';
+import './components/play.js';
+import './components/comments.js';
+import './utils/loading.js';
 import './data/link.js';
-import { sortVideos, filterVideos } from './modules/sorting.js';
+import { sortVideos } from './utils/sorting.js';
 
 function handleSortChange() {
     const criteria = document.getElementById("sortCriteria").value;

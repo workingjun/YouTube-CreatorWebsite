@@ -18,6 +18,6 @@ for element in elements:
     external_link = elems[1].find_element(By.TAG_NAME, "a").get_attribute('href')
     dic[f"{elems[0].text}"] = {"image_link":img_link, "external_link":external_link}
 
-with open("youtube_data/transfer_files/Link_data.json", "w", encoding="utf-8") as file:
+with open("/transfer_files/json/link_data.json", "w", encoding="utf-8") as file:
     json.dump(dic, file, ensure_ascii=False, indent=4)
 gh.terminate_chrome_process()

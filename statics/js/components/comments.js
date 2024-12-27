@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
             loadingSpinner.style.display = 'flex';
 
             try {
-                // 댓글 데이터 가져오기 (PHP API 호출)
-                const response = await fetch(`http://friendshiping.ct.ws/js/modules/comments.php?videoId=${videoId}`);
+                // 댓글 데이터 가져오기 (Flask API 호출)
+                const response = await fetch(`http://your_username.pythonanywhere.com/comments?videoId=${videoId}`);
                 const comments = await response.json();
 
                 // 댓글 모달 생성
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-
+    
     // 댓글 모달 생성 함수
     function showCommentsModal(videoId, comments) {
         let modal = document.getElementById('comments-modal');

@@ -1,12 +1,11 @@
 // JSON 파일 경로
-const jsonFilePath = './js/data/link_data.json';
+const apiUrl = '/links';
 
 // JSON 파일 가져오기 및 렌더링
 async function loadLinks() {
     try {
-        const response = await fetch(jsonFilePath);
-
-        if (!response.ok) throw new Error('JSON 파일을 불러오는 데 실패했습니다.');
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('API 요청 실패');
 
         const linkData = await response.json();
         const linkList = document.getElementById('link-list');
