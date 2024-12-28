@@ -17,14 +17,14 @@ class BaseDatabaseManager:
                 local_bind_address=('127.0.0.1', 0)  # 동적 포트
             )
             BaseDatabaseManager._tunnel.start()
-            print(f"SSH 터널 연결 성공: {BaseDatabaseManager._tunnel.local_bind_port}")
+            print(f"[SUCCESS] SSH 터널 연결 성공: {BaseDatabaseManager._tunnel.local_bind_port}")
 
     @staticmethod
     def stop_ssh_tunnel():
         if BaseDatabaseManager._tunnel is not None:
             BaseDatabaseManager._tunnel.stop()
             BaseDatabaseManager._tunnel = None
-            print("SSH 터널 연결 종료")
+            print("[SUCCESS] SSH 터널 연결 종료")
         
     def connect(self):
         print("[INFO] Starting SSH tunnel...")
@@ -53,6 +53,7 @@ class BaseDatabaseManager:
         try:
             self.cursor.execute(query, values)
             self.conn.commit()
+            print("[SUCCESS] Batch query executed.")
         except pymysql.OperationalError as e:
             print(f"[OperationalError] Query execution failed: {e}")
             self.__init__()
@@ -67,12 +68,43 @@ class BaseDatabaseManager:
         except pymysql.MySQLError as e:
             print(f"[Error] Fetching data failed: {e}")
             return []
+        
+    def fetch_one(self, query, values=None):
+        try:
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()  # 첫 번째 행만 가져옴
+            return result
+        except pymysql.MySQLError as e:
+            print(f"[ERROR] Fetching data failed: {e}")
+            return None
+    
+    def execute_query_many(self, query, data_list):
+        try:
+            self.cursor.executemany(query, data_list)
+            self.conn.commit()  # Commit the transaction
+            print("[SUCCESS] Batch query executed.")
+        except Exception as e:
+            self.conn.rollback()  # Rollback the transaction in case of an error
+            print(f"[ERROR] Batch query failed: {e}")
 
 # 아래 Manager 클래스들은 기존 코드와 동일합니다
 class VideoDataManager(BaseDatabaseManager):
     """비디오 데이터를 관리하는 클래스"""
-    def upsert_videoData(self, video_id, title, view_count, like_count, comment_count, publish_time, is_shorts):
-        print(f"[INFO] Inserting or updating video data for video_id: {video_id}")
+    def upsert_videoData(self, video_data_list):
+        data_list = [
+            (
+                video["video_id"],
+                video["title"],
+                video["view_count"],
+                video["like_count"],
+                video["comment_count"],
+                video["publish_time"],
+                video["is_shorts"],
+            )
+            for video in video_data_list
+        ]
+        print(f"[INFO] Inserting or updating video data")
+        
         sql = """
         INSERT INTO videoData (video_id, title, view_count, like_count, comment_count, publish_time, is_shorts)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -84,9 +116,8 @@ class VideoDataManager(BaseDatabaseManager):
             publish_time = VALUES(publish_time),
             is_shorts = VALUES(is_shorts)
         """
-        values = (video_id, title, view_count, like_count, comment_count, publish_time, is_shorts)
-        self.execute_query(sql, values)
-        print(f"[SUCCESS] Video data processed for video_id: {video_id}")
+        self.execute_query_many(sql, data_list)
+        print(f"[SUCCESS] Video data processed")
 
     def fetch_all_videoData(self):
         print("[INFO] Fetching all video data")
@@ -99,6 +130,17 @@ class CommentDataManager(BaseDatabaseManager):
     """댓글 데이터를 관리하는 클래스"""
     def upsert_comments(self, video_id, author, text, like_count):
         print(f"[INFO] Inserting or updating comment for video_id: {video_id}, author: {author}")
+
+        # 기존 데이터 조회
+        sql_check = "SELECT text, like_count FROM comments WHERE video_id = %s AND author = %s"
+        existing_data = self.fetch_one(sql_check, (video_id, author))
+
+        # 데이터가 존재하고 동일한 경우 건너뜁니다
+        if existing_data:
+            if (existing_data == (text, like_count)):
+                print(f"[INFO] Skipping update for comment by {author} on video_id: {video_id}, data is identical.")
+                return
+            
         sql = """
         INSERT INTO comments (video_id, author, text, like_count)
         VALUES (%s, %s, %s, %s)
@@ -120,8 +162,15 @@ class CommentDataManager(BaseDatabaseManager):
 
 class VideoIdManager(BaseDatabaseManager):
     """비디오 아이디를 관리하는 클래스"""
-    def upsert_videoIds(self, video_id, publish_time):
-        print(f"[INFO] Inserting or updating video ID: {video_id}")
+    def upsert_videoIds(self, video_ids_list):
+        print(f"[INFO] Inserting or updating video IDs:")
+        data_list = [
+            (
+                video_id["video_id"],
+                video_id["publish_time"]
+            )
+            for video_id in video_ids_list
+        ]
         sql = """
         INSERT INTO videoId (video_id, publish_time)
         VALUES (%s, %s)
@@ -129,9 +178,8 @@ class VideoIdManager(BaseDatabaseManager):
             video_id = VALUES(video_id),
             publish_time = VALUES(publish_time)
         """
-        values = (video_id, publish_time)
-        self.execute_query(sql, values)
-        print(f"[SUCCESS] Video ID processed: {video_id}")
+        self.execute_query_many(sql, data_list)
+        print(f"[SUCCESS] Video ID processed")
 
     def fetch_videoIds(self):
         print("[INFO] Fetching all video IDs")

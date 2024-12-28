@@ -23,10 +23,18 @@ CREATE TABLE comments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE comments
+ADD CONSTRAINT unique_video_id UNIQUE (video_id);
+
+
 CREATE TABLE videoId (
     video_id VARCHAR(255) NOT NULL, 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    publish_time DATETIME NOT NULL
 );
+
+ALTER TABLE videoId
+ADD CONSTRAINT unique_video_id UNIQUE (video_id);
+
 
 CREATE TABLE videoData (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -40,41 +48,9 @@ CREATE TABLE videoData (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE videoData
+ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255);
 
-
-
-
-
-
-CREATE TABLE ErrorLogs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    timestamp DATETIME,
-    error_type VARCHAR(50), 
-    message TEXT,          
-);
-
-
-CREATE TABLE ProgressLogs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    timestamp DATETIME,
-    process_name VARCHAR(100), 
-    step_name VARCHAR(100),    
-    status VARCHAR(50),        
-    details TEXT              
-);
-
-CREATE TABLE Logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    timestamp DATETIME,
-    log_type ENUM('Error', 'Progress'), -- 로그 유형 (에러/진행)
-    log_level VARCHAR(50),             -- 로그 수준 (INFO, WARNING, ERROR)
-    category VARCHAR(50),              -- 로그 카테고리 (예: Database, Training)
-    message TEXT,                      -- 메시지 내용
-    extra_data JSON                    -- 추가 데이터 (예: 에러 코드, 진행 정보 등)
-);
-
-ALTER TABLE videoid
-ADD CONSTRAINT unique_video_id UNIQUE (video_id);
 
 SET @new_id = 0;
 
@@ -87,3 +63,8 @@ ALTER TABLE videoid AUTO_INCREMENT = 1;
 FLUSH PRIVILEGES;
 
 TRUNCATE TABLE logs;
+
+GRANT ALL PRIVILEGES ON `ytbCreator$YoutubeDATA1`.* TO 'ytbCreator'@'%';
+FLUSH PRIVILEGES;
+
+

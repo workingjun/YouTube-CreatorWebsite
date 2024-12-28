@@ -4,29 +4,25 @@ from datetime import datetime
 import math 
 
 class HTMLGenerator:
-    def __init__(self, db_manager: MySQLYouTubeDB):
-        self.output_path = "transfer_files/index.html"
-        self.db_manager = db_manager
-        
-    def save_index_to_file(self):
-        last_video_cards = self.make_video_card(hidden=False)
-        video_cards = self.make_video_card(start=5, stop=-1)
+    def save_index_to_file(self, output_path, db_manager: MySQLYouTubeDB):
+        last_video_cards = self.make_video_card(db_manager, info_flag=True)
+        video_cards = self.make_video_card(db_manager, info_flag=False)
         self.template = load_template()
         html_output = self.template.format(
             last_video_cards=last_video_cards,
             video_cards=video_cards
             )
-        with open(self.output_path, "w", encoding="utf-8") as file:
+        with open(output_path, "w", encoding="utf-8") as file:
             file.write(html_output)
 
-    def make_video_card(self, start=0, stop=5, hidden=True):
+    def make_video_card(self, db_manager: MySQLYouTubeDB, info_flag=True):
         # Fetch video data
-        df_videos = self.db_manager.fetch_all_videoData()
+        dic_videos = db_manager.fetch_all_videoData()
         video_cards_list = []  # HTML 조각을 저장할 리스트
-        hidden_text = "video-card hidden" if hidden else "video-card-info"
-
+        hidden_text = "video-card-info" if info_flag else "video-card hidden"
+        info_index = range(0, 5) if info_flag else range(5, len(dic_videos))
         # Generate video cards
-        for row in df_videos[start:stop]:
+        for row in dic_videos[info_index.start:info_index.stop]:
             # Calculate engagement metrics
             publish_time = row['publish_time']
             view_count = format(row['view_count'], ",")
@@ -35,7 +31,11 @@ class HTMLGenerator:
             current_time = datetime.now()
             time_difference = current_time - publish_time
             elapsed_hours = time_difference.total_seconds() / 3600  # Convert seconds to hours
-            Engagement_Rate = (row['comment_count'] + row['like_count']) / row['view_count']
+            view_count = row.get('view_count', 0)
+            if view_count == 0:
+                Engagement_Rate = 0
+            else:
+                Engagement_Rate = (row['comment_count'] + row['like_count']) / view_count
             half_life = 24 * 30  # 30 days
             trand_point = Engagement_Rate * math.exp(-elapsed_hours / half_life)
 

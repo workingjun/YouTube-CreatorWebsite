@@ -6,7 +6,7 @@ import './loading.js';
 import './channel_info.js';
 import { sortVideos } from './sorting.js';
 
-function handleSortChange() {
+async function handleSortChange() {
     const criteria = document.getElementById("sortCriteria").value;
     sortVideos(criteria);
 }

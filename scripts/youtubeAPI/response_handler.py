@@ -35,6 +35,7 @@ class YouTubeResponseHandler:
         return {
             "title": channel_info["snippet"]["title"],
             "channel_id": channel_info["id"],
+            "thumbnail": channel_info["snippet"]["thumbnails"]["high"]["url"],
             "description": channel_info["snippet"]["description"],
             "subscriber_count": int(channel_info["statistics"]["subscriberCount"]),
             "video_count": int(channel_info["statistics"]["videoCount"]),

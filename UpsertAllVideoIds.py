@@ -10,9 +10,5 @@ if __name__=="__main__":
 
     db_manager = MySQLYouTubeDB()
     db_manager.connect()
-    for video_data in all_video_data:
-        db_manager.upsert_videoId(
-            video_id=video_data["video_id"], 
-            publish_time=video_data["published_time"]
-            )
+    db_manager.upsert_videoIds(video_ids_list=all_video_data)
     db_manager.close()

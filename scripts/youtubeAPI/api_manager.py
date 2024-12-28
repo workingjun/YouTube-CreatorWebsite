@@ -28,13 +28,18 @@ class YoutubeApiManager:
         )
 
     def get_comments(self, video_id):
-        return self.fetch_response(
-            "commentThreads.list",
-            part="snippet",
-            videoId=video_id,
-            maxResults=100,
-            order="relevance"
-        )
+        try:
+            return self.fetch_response(
+                "commentThreads.list",
+                part="snippet",
+                videoId=video_id,
+                maxResults=100,
+                order="relevance"
+            )
+        except Exception as e:
+            print(f"[ERROR] Failed to fetch comments for video_id={video_id}: {e}")
+            return None
+
 
     def get_videoIds(self):
         return self.fetch_response(

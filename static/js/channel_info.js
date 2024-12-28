@@ -1,10 +1,8 @@
-// 채널 정보와 링크 데이터 JSON 파일 경로
-const channelInfoUrl = '/json/ChannelInfo.json';
-const linksUrl = '/json/LinkData.json';
-
 // 채널 정보 로드 및 렌더링
 async function loadChannelInfo() {
     try {
+        const channelInfoUrl = '/ChannelInfo';
+
         const response = await fetch(channelInfoUrl);
         if (!response.ok) throw new Error('채널 정보 API 요청 실패');
 
@@ -26,6 +24,7 @@ async function loadChannelInfo() {
 // 링크 데이터 로드 및 렌더링
 async function loadLinks() {
     try {
+        const linksUrl = '/LinkData';
         const response = await fetch(linksUrl);
         if (!response.ok) throw new Error('링크 API 요청 실패');
 

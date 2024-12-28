@@ -1,8 +1,8 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def load_template():
-    with open("template/template.html", "r", encoding="utf-8") as file:
+    with open("templates/template.html", "r", encoding="utf-8") as file:
         template = file.read()
         template = template.replace("{", "{{").replace("}", "}}")
         template = template.replace("{{channel_name}}", "{channel_name}")
@@ -18,12 +18,9 @@ def load_template():
         return template
 
 def transform_datetime(publish_time):
-    publish_time_list = list(publish_time.replace("T", " ").replace("Z", ""))
-    previous_time = "".join(publish_time_list[11:13])
-    plus_time = int(previous_time) + 9
-    publish_time_list[11:13] = str(plus_time)
-    publish_time = "".join(publish_time_list)  
-    return datetime.strptime(publish_time, "%Y-%m-%d %H:%M:%S")  
+    publish_time = datetime.strptime(publish_time, "%Y-%m-%dT%H:%M:%SZ")
+    publish_time += timedelta(hours=9)
+    return publish_time
 
 def is_short_video(duration):
     """동영상이 Shorts인지 확인 (true/false로 반환)"""
