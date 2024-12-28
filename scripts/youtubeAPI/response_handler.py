@@ -12,11 +12,9 @@ class YouTubeResponseHandler:
             "search.list": YouTubeResponseHandler._parse_channel_id_by_name,
             "search.Idlist": YouTubeResponseHandler._parse_video_Ids
         }
-
         parser = parsers.get(api_name)
         if not parser:
             raise ValueError(f"Unsupported API: {api_name}")
-
         return parser(response)
     
     @staticmethod

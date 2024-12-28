@@ -1,13 +1,5 @@
-from DB.database import CommentDataManager, CombinedDataManager, VideoIdManager
-from dataclasses import dataclass
 import re
 from datetime import datetime
-
-@dataclass
-class DBManager:
-    Comments: CommentDataManager
-    VideoId: VideoIdManager
-    Combine: CombinedDataManager
 
 def load_template():
     with open("template/template.html", "r", encoding="utf-8") as file:
@@ -26,7 +18,7 @@ def load_template():
         return template
 
 def transform_datetime(publish_time):
-    publish_time_list=list(publish_time.replace("T", " ").replace("Z", ""))
+    publish_time_list = list(publish_time.replace("T", " ").replace("Z", ""))
     previous_time = "".join(publish_time_list[11:13])
     plus_time = int(previous_time) + 9
     publish_time_list[11:13] = str(plus_time)
@@ -34,12 +26,13 @@ def transform_datetime(publish_time):
     return datetime.strptime(publish_time, "%Y-%m-%d %H:%M:%S")  
 
 def is_short_video(duration):
-    """동영상이 Shorts인지 확인"""
+    """동영상이 Shorts인지 확인 (true/false로 반환)"""
     match = re.match(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", duration)
     if match:
         hours = int(match.group(1) or 0)
         minutes = int(match.group(2) or 0)
         seconds = int(match.group(3) or 0)
         total_seconds = hours * 3600 + minutes * 60 + seconds
-        return total_seconds <= 60
-    return False
+        return "true" if total_seconds <= 60 else "false"
+    return "false"
+

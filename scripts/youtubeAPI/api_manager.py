@@ -11,7 +11,6 @@ class YoutubeApiManager:
         """API 요청과 응답 처리"""
         request = self.youtube.__getattribute__(api_name.split(".")[0])().list(**params)
         response = request.execute()
-
         return YouTubeResponseHandler.parse_response(api_name=api_name, response=response)
     
     def get_channel_information(self):

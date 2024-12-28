@@ -1,6 +1,3 @@
-from googleapiclient.discovery import build
-from config.api_config import api_key
-
 def fetch_all_playlists(youtube, channel_id):
     """채널에서 모든 재생목록 ID를 가져오기"""
     playlist_ids = []
@@ -55,9 +52,5 @@ def fetch_all_playlist_items(youtube, playlist_ids):
             next_page_token = response.get("nextPageToken")
             if not next_page_token:
                 break  # 더 이상 페이지가 없으면 종료
-
     return all_video_data
 
-youtube = build("youtube", "v3", developerKey=api_key[0])
-playlist_ids = fetch_all_playlists(youtube, "UCW945UjEs6Jm3rVNvPEALdg")
-all_video_data = fetch_all_playlist_items(youtube, playlist_ids)

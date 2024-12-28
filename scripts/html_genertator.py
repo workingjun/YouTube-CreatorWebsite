@@ -1,20 +1,14 @@
 from scripts.utils.utils import load_template
-from DB.database import CommentDataManager, CombinedDataManager, VideoIdManager
-from scripts.youtubeAPI.api_manager import YoutubeApiManager
-from scripts.utils.utils import DBManager
+from DB.database import MySQLYouTubeDB
 from datetime import datetime
 import math 
 
 class HTMLGenerator:
-    def __init__(self):
+    def __init__(self, db_manager: MySQLYouTubeDB):
         self.output_path = "transfer_files/index.html"
-        self.db_manager = DBManager(
-            Comments=CommentDataManager(),
-            VideoId=VideoIdManager(),
-            Combine=CombinedDataManager()
-        )
-
-    def save_index_to_file(self, api_manager: YoutubeApiManager):
+        self.db_manager = db_manager
+        
+    def save_index_to_file(self):
         last_video_cards = self.make_video_card(hidden=False)
         video_cards = self.make_video_card(start=5, stop=-1)
         self.template = load_template()
@@ -27,7 +21,7 @@ class HTMLGenerator:
 
     def make_video_card(self, start=0, stop=5, hidden=True):
         # Fetch video data
-        df_videos = self.db_manager.Combine.fetch_all_videoData()
+        df_videos = self.db_manager.fetch_all_videoData()
         video_cards_list = []  # HTML 조각을 저장할 리스트
         hidden_text = "video-card hidden" if hidden else "video-card-info"
 

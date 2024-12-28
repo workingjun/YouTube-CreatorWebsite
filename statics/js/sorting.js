@@ -39,11 +39,14 @@ export function filterVideos(criteria) {
     // 기준에 따라 비디오 카드 필터링
     const allVideoCards = document.querySelectorAll('.video-card');
     if (criteria === 'shorts') {
-        // data-is-shorts="1" 속성이 있는 카드만 포함
-        filteredVideoCards = Array.from(allVideoCards).filter(card => 
-            card.getAttribute('data-is-shorts') === '1'
+        // data-is-shorts="true" 속성이 있는 카드만 포함
+        filteredVideoCards = Array.from(allVideoCards).filter(card =>
+            card.getAttribute('data-is-shorts') === 'true' // 문자열로 비교
         );
-    } 
+    } else {
+        // 다른 기준일 경우 모든 카드를 필터링 결과로 설정
+        filteredVideoCards = Array.from(allVideoCards);
+    }
 
     // 모든 카드를 숨기고 필터링된 카드만 표시
     allVideoCards.forEach(card => card.classList.add('hidden'));
