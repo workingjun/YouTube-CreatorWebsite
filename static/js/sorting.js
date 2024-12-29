@@ -59,3 +59,6 @@ export function filterVideos(criteria) {
     // 필터 초기화
     currentIndex = Math.min(itemsPerLoad, filteredVideoCards.length);
 }
+
+// 전역 스코프에 추가
+window.filterVideos = filterVideos;

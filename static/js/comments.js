@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         modal.innerHTML = `
             <div style="position: relative; background: white; padding: 20px; border-radius: 10px; max-width: 600px; max-height: 80%; overflow-y: auto;">
-                <button style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer;" onclick="closeCommentsModal()">×</button>
+                <button id="close-modal-btn" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer;" onclick="closeCommentsModal()">×</button>
                 ${comments.length === 0 ? '<p>댓글이 없습니다.</p>' : `
                     <ul>
                         ${comments.map(comment => `
@@ -62,15 +62,19 @@ document.addEventListener('DOMContentLoaded', function () {
                             </li>`).join('')}
                     </ul>
                 `}
-                <button style="margin-top: 20px; padding: 10px 20px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;" onclick="closeCommentsModal()">닫기</button>
+                <button id="close-modal-btn" style="margin-top: 20px; padding: 10px 20px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;" onclick="closeCommentsModal()">닫기</button>
             </div>
         `;
 
         modal.style.display = 'flex'; // 모달 표시
     }
-
-    function closeCommentsModal() {
-        const modal = document.getElementById('comments-modal');
-        if (modal) modal.style.display = 'none';
-    }
 });
+
+// 모듈 방식으로 내보내기
+export function closeCommentsModal() {
+    const modal = document.getElementById('comments-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+// 전역 스코프에 추가
+window.closeCommentsModal = closeCommentsModal;
