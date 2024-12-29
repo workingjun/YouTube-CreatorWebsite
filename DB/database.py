@@ -5,31 +5,33 @@ class BaseDatabaseManager:
     _shared_connection = None
     _tunnel = None
 
-    #@staticmethod
-    #def start_ssh_tunnel():
-    #    if BaseDatabaseManager._tunnel is None:
-    #        BaseDatabaseManager._tunnel = sshtunnel.SSHTunnelForwarder(
-    #            (SSH_HOST, 22),
-    #            ssh_username=SSH_USER,
-    #            ssh_password=SSH_PASSWORD,
-    #            remote_bind_address=(MYSQL_HOST, 3306),
-    #            local_bind_address=('127.0.0.1', 0)  # 동적 포트
-    #        )
-    #        BaseDatabaseManager._tunnel.start()
-    #        print(f"[SUCCESS] SSH 터널 연결 성공: {BaseDatabaseManager._tunnel.local_bind_port}")
-
-    #@staticmethod
-    #def stop_ssh_tunnel():
-    #    if BaseDatabaseManager._tunnel is not None:
-    #        BaseDatabaseManager._tunnel.stop()
-    #        BaseDatabaseManager._tunnel = None
-    #        print("[SUCCESS] SSH 터널 연결 종료")
+    @staticmethod
+    def start_ssh_tunnel():
+        import sshtunnel
+        if BaseDatabaseManager._tunnel is None:
+            BaseDatabaseManager._tunnel = sshtunnel.SSHTunnelForwarder(
+                (SSH_HOST, 22),
+                ssh_username=SSH_USER,
+                ssh_password=SSH_PASSWORD,
+                remote_bind_address=(MYSQL_HOST, 3306),
+                local_bind_address=('127.0.0.1', 0)  # 동적 포트
+            )
+            BaseDatabaseManager._tunnel.start()
+            print(f"[SUCCESS] SSH 터널 연결 성공: {BaseDatabaseManager._tunnel.local_bind_port}")
+    
+    @staticmethod
+    def stop_ssh_tunnel():
+        if BaseDatabaseManager._tunnel is not None:
+            BaseDatabaseManager._tunnel.stop()
+            BaseDatabaseManager._tunnel = None
+            print("[SUCCESS] SSH 터널 연결 종료")
         
-    def connect(self):
-        #print("[INFO] Starting SSH tunnel...")
-        #self.start_ssh_tunnel()
-        #DB_COMFIG["port"] = BaseDatabaseManager._tunnel.local_bind_port
-        #print(f"[INFO] SSH tunnel started at local port {BaseDatabaseManager._tunnel.local_bind_port}")
+    def connect(self, ssh_flags: bool=False):
+        if ssh_flags:
+            print("[INFO] Starting SSH tunnel...")
+            self.start_ssh_tunnel()
+            DB_COMFIG["port"] = BaseDatabaseManager._tunnel.local_bind_port
+            print(f"[INFO] SSH tunnel started at local port {BaseDatabaseManager._tunnel.local_bind_port}")
         try:
             if BaseDatabaseManager._shared_connection is None:
                 BaseDatabaseManager._shared_connection = pymysql.connect(**DB_COMFIG)
