@@ -1,5 +1,8 @@
 import { getItemsPerLoad } from './loading.js';
+
 let filteredVideoCards = []; // 필터링된 비디오 카드
+let currentIndex = 0; // 현재 로드된 비디오 카드의 인덱스
+const itemsPerLoad = getItemsPerLoad();
 
 export function sortVideos(criteria) {
     const container = document.getElementById('popular-videos-container');
@@ -19,8 +22,6 @@ export function sortVideos(criteria) {
             return valueB - valueA; // 내림차순
         }
     });
-
-    const itemsPerLoad = getItemsPerLoad();
 
     // 정렬된 요소를 다시 추가
     sortedVideos.forEach((video, index) => {
@@ -57,7 +58,7 @@ export function filterVideos(criteria) {
     });
 
     // 필터 초기화
-    currentIndex = Math.min(itemsPerLoad, filteredVideoCards.length);
+    currentIndex = Math.min(itemsPerLoad, filteredVideoCards.length); // 필터링된 후 보여줄 인덱스 관리
 }
 
 // 전역 스코프에 추가

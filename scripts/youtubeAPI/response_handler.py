@@ -83,7 +83,7 @@ class YouTubeResponseHandler:
                 published_time = transform_datetime(item['snippet']['publishedAt']) 
                 video_data.append({
                     "video_id": video_id,
-                    "published_time": published_time
+                    "publish_time": published_time
                 })
         return video_data
 

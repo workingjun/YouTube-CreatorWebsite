@@ -15,16 +15,13 @@ class YOUTUBECreatorWebsite:
 
     def update_index_html(self, index_path, db_manager, update_video_ids:bool):
         """Updates the index.html with the latest channel data"""
-        try:
-            # Save channel information
-            self.youtube_manager.save_channel_information()
-            # Collect partial video data
-            self.youtube_manager.collect_data(db_manager=db_manager, update_video_ids=update_video_ids)
-            # Generate and save updated HTML file
-            self.html_manager.save_index_to_file(output_path=index_path, db_manager=db_manager)
-        except Exception as e:
-            raise RuntimeError(f"Failed to update index.html: {str(e)}")
-        
+        # Save channel information
+        self.youtube_manager.save_channel_information()
+        # Collect partial video data
+        self.youtube_manager.collect_data(db_manager=db_manager, update_video_ids=update_video_ids)
+        # Generate and save updated HTML file
+        self.html_manager.save_index_to_file(output_path=index_path, db_manager=db_manager)
+    
 # Blueprint for comments functionality
 comments_bp = Blueprint('comments', __name__)
 
@@ -95,12 +92,12 @@ def index():
         youtube_creator = YOUTUBECreatorWebsite(
             channelID="UCW945UjEs6Jm3rVNvPEALdg",
             api_key=api_key[0]
-        )
+            )
         youtube_creator.update_index_html(
             index_path="templates/index.html",
             db_manager=g.db_manager,
             update_video_ids=True
-        )
+            )
     except RuntimeError as e:
         app.logger.error(f"Failed to update index.html: {e}")
         return jsonify({"error": str(e)}), 500

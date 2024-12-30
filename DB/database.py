@@ -1,5 +1,5 @@
-import pymysql
-from config.db_config import DB_COMFIG, SSH_HOST, SSH_PASSWORD, SSH_USER, MYSQL_HOST
+import pymysql, time
+from config.db_config import DB_CONFIG_DEFAULT, DB_CONFIG_SSH , SSH_HOST, SSH_PASSWORD, SSH_USER, MYSQL_HOST
 
 class BaseDatabaseManager:
     _shared_connection = None
@@ -26,22 +26,39 @@ class BaseDatabaseManager:
             BaseDatabaseManager._tunnel = None
             print("[SUCCESS] SSH 터널 연결 종료")
         
-    def connect(self, ssh_flags: bool=False):
+    def connect(self, ssh_flags: bool=False, retries: int=3, delay: int=5):
         if ssh_flags:
             print("[INFO] Starting SSH tunnel...")
             self.start_ssh_tunnel()
-            DB_COMFIG["port"] = BaseDatabaseManager._tunnel.local_bind_port
+            DB_CONFIG_SSH["port"] = BaseDatabaseManager._tunnel.local_bind_port
+            DB_COMFIG = DB_CONFIG_SSH
             print(f"[INFO] SSH tunnel started at local port {BaseDatabaseManager._tunnel.local_bind_port}")
-        try:
-            if BaseDatabaseManager._shared_connection is None:
-                BaseDatabaseManager._shared_connection = pymysql.connect(**DB_COMFIG)
-            self.conn = BaseDatabaseManager._shared_connection
-            self.cursor = self.conn.cursor()
-            print("[SUCCESS] MySQL connection established")
-        except pymysql.MySQLError as e:
-            print(f"[ERROR] MySQL connection failed: {e}")
-            #self.stop_ssh_tunnel()
-            raise
+        else:
+            DB_COMFIG = DB_CONFIG_DEFAULT
+
+        attempt = 0
+        while attempt < retries:
+            try:
+                if BaseDatabaseManager._shared_connection is None:
+                    print(f"[INFO] Attempting MySQL connection, attempt {attempt + 1} of {retries}")
+                    BaseDatabaseManager._shared_connection = pymysql.connect(**DB_COMFIG)
+
+                self.conn = BaseDatabaseManager._shared_connection
+                self.cursor = self.conn.cursor()
+                print("[SUCCESS] MySQL connection established")
+
+                # 연결 후 주기적으로 연결 상태 확인 및 재연결 시도
+                self.ensure_connection()  # 연결을 확인하고 필요 시 재연결
+
+                return  # 성공하면 종료
+            except pymysql.MySQLError as e:
+                print(f"[ERROR] MySQL connection failed: {e}")
+                attempt += 1
+                if attempt < retries:
+                    print(f"[INFO] Retrying in {delay} seconds...")
+                    time.sleep(delay)  # 재시도 간 대기 시간
+                else:
+                    raise Exception(f"Failed to connect to MySQL after {retries} attempts.")  # 재시도 후 실패하면 예외 발생
 
     def close(self):
         """데이터베이스 연결 종료 (공유 연결 닫기)"""
@@ -52,6 +69,7 @@ class BaseDatabaseManager:
 
     def execute_query(self, query, values=None):
         try:
+            self.ensure_connection()
             self.cursor.execute(query, values)
             self.conn.commit()
             print("[SUCCESS] Batch query executed.")
@@ -64,6 +82,7 @@ class BaseDatabaseManager:
     def fetch_all(self, query, values=None):
         """모든 결과를 가져오는 메서드"""
         try:
+            self.ensure_connection()
             self.cursor.execute(query, values)
             return self.cursor.fetchall()
         except pymysql.MySQLError as e:
@@ -72,6 +91,7 @@ class BaseDatabaseManager:
         
     def fetch_one(self, query, values=None):
         try:
+            self.ensure_connection()
             self.cursor.execute(query, values)
             result = self.cursor.fetchone()  # 첫 번째 행만 가져옴
             return result
@@ -81,12 +101,24 @@ class BaseDatabaseManager:
     
     def execute_query_many(self, query, data_list):
         try:
+            self.ensure_connection()
             self.cursor.executemany(query, data_list)
             self.conn.commit()  # Commit the transaction
             print("[SUCCESS] Batch query executed.")
         except Exception as e:
             self.conn.rollback()  # Rollback the transaction in case of an error
             print(f"[ERROR] Batch query failed: {e}")
+
+    def ensure_connection(self):
+        """MySQL 연결이 유효한지 확인하고, 끊어진 경우 재연결"""
+        try:
+            # MySQL 연결 상태 확인 (reconnect=True 옵션으로 끊어진 경우 복구)
+            self.conn.ping(reconnect=True)
+        except pymysql.MySQLError as e:
+            print("[ERROR] Connection lost. Reconnecting...")
+            # 끊어진 경우 재연결 수행
+            self.connect(ssh_flags=True if BaseDatabaseManager._tunnel else False)
+
 
 # 아래 Manager 클래스들은 기존 코드와 동일합니다
 class VideoDataManager(BaseDatabaseManager):
@@ -119,10 +151,10 @@ class VideoDataManager(BaseDatabaseManager):
         """
         self.execute_query_many(sql, data_list)
         print(f"[SUCCESS] Video data processed")
-
+    
     def fetch_all_videoData(self):
         print("[INFO] Fetching all video data")
-        sql = "SELECT * FROM videoData"
+        sql = "SELECT * FROM videoData ORDER BY publish_time DESC"
         result = self.fetch_all(sql)
         print("[SUCCESS] Fetched all video data")
         return result
