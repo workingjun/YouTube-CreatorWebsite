@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // videoId 추출
             const videoId = card.getAttribute('data-video-id');
+            const group = card.getAttribute('data-group'); // 'friendshiping' 또는 'suhyeon'
             
             // 로딩 스피너 표시
             const loadingSpinner = document.getElementById('loading-spinner');
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 // 댓글 데이터 가져오기 (Flask API 호출)
-                const response = await fetch(`/comments?videoId=${videoId}`);
+                const response = await fetch(`/${group}/comments?videoId=${videoId}`);
                 const comments = await response.json();
 
                 // 댓글 모달 생성

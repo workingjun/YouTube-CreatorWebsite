@@ -17,16 +17,16 @@ class BaseDatabaseManager:
                 local_bind_address=('127.0.0.1', 0)  # 동적 포트
             )
             BaseDatabaseManager._tunnel.start()
-            print(f"[SUCCESS] SSH 터널 연결 성공: {BaseDatabaseManager._tunnel.local_bind_port}")
+            print(f"[SUCCESS] SSH tunnel connection established: {BaseDatabaseManager._tunnel.local_bind_port}")
     
     @staticmethod
     def stop_ssh_tunnel():
         if BaseDatabaseManager._tunnel is not None:
             BaseDatabaseManager._tunnel.stop()
             BaseDatabaseManager._tunnel = None
-            print("[SUCCESS] SSH 터널 연결 종료")
+            print("[SUCCESS] SSH tunnel connection closed")
         
-    def connect(self, ssh_flags: bool=False, retries: int=3, delay: int=5):
+    def connect(self, ssh_flags: bool=False, retries: int=5, delay: int=5):
         if ssh_flags:
             print("[INFO] Starting SSH tunnel...")
             self.start_ssh_tunnel()
@@ -120,10 +120,43 @@ class BaseDatabaseManager:
             self.connect(ssh_flags=True if BaseDatabaseManager._tunnel else False)
 
 
-# 아래 Manager 클래스들은 기존 코드와 동일합니다
 class VideoDataManager(BaseDatabaseManager):
     """비디오 데이터를 관리하는 클래스"""
-    def upsert_videoData(self, video_data_list):
+
+    def upsert_friendshiping_videoData(self, video_data_list):
+        self.upsert_videoData("우정잉", video_data_list)
+    
+    def upsert_suhyeon_videoData(self, video_data_list):
+        self.upsert_videoData("청산유수현 SUHYEON", video_data_list)
+
+    def upsert_bokyem_videoData(self, video_data_list):
+        self.upsert_videoData("보겸TV", video_data_list)
+
+    def upsert_loveme_videoData(self, video_data_list):
+        self.upsert_videoData("김 럽미", video_data_list)
+
+    def upsert_cat_videoData(self, video_data_list):
+        self.upsert_videoData("지식줄고양", video_data_list)
+    
+    def fetch_all_friendshiping_videoData(self):
+        return self.fetch_all_videoData("우정잉")
+    
+    def fetch_all_suhyeon_videoData(self):
+        return self.fetch_all_videoData("청산유수현 SUHYEON")
+    
+    def fetch_all_bokyem_videoData(self):
+        return self.fetch_all_videoData("보겸TV")
+    
+    def fetch_all_loveme_videoData(self):
+        return self.fetch_all_videoData("김 럽미")
+    
+    def fetch_all_cat_videoData(self):
+        return self.fetch_all_videoData("지식줄고양")
+    
+    def upsert_videoData(self, table_name, video_data_list):
+        # 테이블 이름을 백틱으로 감싸기
+        table_name_safe = f"`{table_name}_VIDEO`"
+
         data_list = [
             (
                 video["video_id"],
@@ -136,10 +169,10 @@ class VideoDataManager(BaseDatabaseManager):
             )
             for video in video_data_list
         ]
-        print(f"[INFO] Inserting or updating video data")
+        print(f"[INFO] Inserting or updating video data in {table_name}")
         
-        sql = """
-        INSERT INTO videoData (video_id, title, view_count, like_count, comment_count, publish_time, is_shorts)
+        sql = f"""
+        INSERT INTO {table_name_safe} (video_id, title, view_count, like_count, comment_count, publish_time, is_shorts)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         ON DUPLICATE KEY UPDATE
             title = VALUES(title),
@@ -150,53 +183,55 @@ class VideoDataManager(BaseDatabaseManager):
             is_shorts = VALUES(is_shorts)
         """
         self.execute_query_many(sql, data_list)
-        print(f"[SUCCESS] Video data processed")
+        print(f"[SUCCESS] Video data processed in {table_name}")
     
-    def fetch_all_videoData(self):
-        print("[INFO] Fetching all video data")
-        sql = "SELECT * FROM videoData ORDER BY publish_time DESC"
+    def fetch_all_videoData(self, table_name):
+        # 테이블 이름을 백틱으로 감싸기
+        table_name_safe = f"`{table_name}_VIDEO`"
+        print(f"[INFO] Fetching all video data from {table_name}")
+        sql = f"SELECT * FROM {table_name_safe} ORDER BY publish_time DESC"
         result = self.fetch_all(sql)
-        print("[SUCCESS] Fetched all video data")
+        print(f"[SUCCESS] Fetched all video data from {table_name}")
         return result
 
-class CommentDataManager(BaseDatabaseManager):
-    """댓글 데이터를 관리하는 클래스"""
-    def upsert_comments(self, video_id, author, text, like_count):
-        print(f"[INFO] Inserting or updating comment for video_id: {video_id}, author: {author}")
-
-        # 기존 데이터 조회
-        sql_check = "SELECT text, like_count FROM comments WHERE video_id = %s AND author = %s"
-        existing_data = self.fetch_one(sql_check, (video_id, author))
-
-        # 데이터가 존재하고 동일한 경우 건너뜁니다
-        if existing_data:
-            if (existing_data == (text, like_count)):
-                print(f"[INFO] Skipping update for comment by {author} on video_id: {video_id}, data is identical.")
-                return
-            
-        sql = """
-        INSERT INTO comments (video_id, author, text, like_count)
-        VALUES (%s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-            author = VALUES(author),
-            text = VALUES(text),
-            like_count = VALUES(like_count)
-        """
-        values = (video_id, author, text, like_count)
-        self.execute_query(sql, values)
-        print(f"[SUCCESS] Comment processed for video_id: {video_id}, author: {author}")
-
-    def fetch_comments(self, video_id):
-        print(f"[INFO] Fetching comments for video_id: {video_id}")
-        sql = "SELECT author, text, like_count, created_at FROM comments WHERE video_id = %s"
-        result = self.fetch_all(sql, (video_id,))
-        print(f"[SUCCESS] Fetched comments for video_id: {video_id}")
-        return result
 
 class VideoIdManager(BaseDatabaseManager):
     """비디오 아이디를 관리하는 클래스"""
-    def upsert_videoIds(self, video_ids_list):
-        print(f"[INFO] Inserting or updating video IDs:")
+    
+    def upsert_friendshiping_videoIds(self, video_data_list):
+        self.upsert_videoIds("우정잉", video_data_list)
+    
+    def upsert_suhyeon_videoIds(self, video_data_list):
+        self.upsert_videoIds("청산유수현 SUHYEON", video_data_list)
+
+    def upsert_bokyem_videoIds(self, video_data_list):
+        self.upsert_videoIds("보겸TV", video_data_list)
+
+    def upsert_loveme_videoIds(self, video_data_list):
+        self.upsert_videoIds("김 럽미", video_data_list)
+
+    def upsert_cat_videoIds(self, video_data_list):
+        self.upsert_videoIds("지식줄고양", video_data_list)
+    
+    def fetch_all_friendshiping_videoIds(self):
+        return self.fetch_videoIds("우정잉")
+    
+    def fetch_all_suhyeon_videoIds(self):
+        return self.fetch_videoIds("청산유수현 SUHYEON")
+    
+    def fetch_all_bokyem_videoIds(self):
+        return self.fetch_videoIds("보겸TV")
+    
+    def fetch_all_loveme_videoIds(self):
+        return self.fetch_videoIds("김 럽미")
+    
+    def fetch_all_cat_videoIds(self):
+        return self.fetch_videoIds("지식줄고양")
+    
+    def upsert_videoIds(self, table_name, video_ids_list):
+        # 테이블 이름을 백틱으로 감싸기
+        table_name_safe = f"`{table_name}_IDS`"
+        print(f"[INFO] Inserting or updating video IDs in {table_name}:")
         data_list = [
             (
                 video_id["video_id"],
@@ -204,23 +239,26 @@ class VideoIdManager(BaseDatabaseManager):
             )
             for video_id in video_ids_list
         ]
-        sql = """
-        INSERT INTO videoId (video_id, publish_time)
+        sql = f"""
+        INSERT INTO {table_name_safe} (video_id, publish_time)
         VALUES (%s, %s)
         ON DUPLICATE KEY UPDATE
             video_id = VALUES(video_id),
             publish_time = VALUES(publish_time)
         """
         self.execute_query_many(sql, data_list)
-        print(f"[SUCCESS] Video ID processed")
+        print(f"[SUCCESS] Video IDs processed in {table_name}")
 
-    def fetch_videoIds(self):
-        print("[INFO] Fetching all video IDs")
-        sql = "SELECT * FROM videoId ORDER BY publish_time DESC"
+    def fetch_videoIds(self, table_name):
+        # 테이블 이름을 백틱으로 감싸기
+        table_name_safe = f"`{table_name}_IDS`"
+
+        print(f"[INFO] Fetching all video IDs from {table_name}")
+        sql = f"SELECT * FROM {table_name_safe} ORDER BY publish_time DESC"
         result = self.fetch_all(sql)
-        print("[SUCCESS] Fetched all video IDs")
+        print(f"[SUCCESS] Fetched all video IDs from {table_name}")
         return result
            
-class MySQLYouTubeDB(CommentDataManager, VideoDataManager, VideoIdManager):
+class MySQLYouTubeDB(VideoDataManager, VideoIdManager):
     """댓글과 비디오 데이터를 모두 관리하는 클래스"""
     pass

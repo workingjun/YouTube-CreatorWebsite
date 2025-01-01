@@ -3,3 +3,4 @@ modules/__pycache__/
 config/api_config.py
 config/db_config.py
 template/index.html
+chrometemp/

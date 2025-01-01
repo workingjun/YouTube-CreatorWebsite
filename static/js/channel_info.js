@@ -1,7 +1,27 @@
+// 그룹별 API 경로를 결정하는 함수
+function getApiUrl(basePath) {
+    const pathName = window.location.pathname;
+    if (pathName.includes('/friendshiping')) {
+        return `/friendshiping${basePath}`;
+    } else if (pathName.includes('/suhyeon')) {
+        return `/suhyeon${basePath}`;
+    }
+    else if (pathName.includes('/bokyem')) {
+        return `/bokyem${basePath}`;
+    }
+    else if (pathName.includes('/loveme')) {
+        return `/loveme${basePath}`;
+    }
+    else if (pathName.includes('/cat')) {
+        return `/cat${basePath}`;
+    }
+    return basePath; // 기본 경로
+}
+
 // 채널 정보 로드 및 렌더링
 async function loadChannelInfo() {
     try {
-        const channelInfoUrl = '/ChannelInfo';
+        const channelInfoUrl = getApiUrl('/ChannelInfo');
 
         const response = await fetch(channelInfoUrl);
         if (!response.ok) throw new Error('채널 정보 API 요청 실패');
@@ -9,7 +29,7 @@ async function loadChannelInfo() {
         const channelInfo = await response.json();
 
         // DOM 요소에 데이터 삽입
-        document.getElementById('channel-link').href = `https://www.youtube.com/channel/${channelInfo.channelID}`;
+        document.getElementById('channel-link').href = `https://www.youtube.com/channel/${channelInfo.channel_id}`;
         document.getElementById('channel-thumbnail').src = channelInfo.thumbnail;
         document.getElementById('channel-name').textContent = channelInfo.title;
         document.getElementById('subscriber-count').textContent = channelInfo.subscriber_count.toLocaleString();
@@ -24,7 +44,7 @@ async function loadChannelInfo() {
 // 링크 데이터 로드 및 렌더링
 async function loadLinks() {
     try {
-        const linksUrl = '/LinkData';
+        const linksUrl = getApiUrl('/LinkData');
         const response = await fetch(linksUrl);
         if (!response.ok) throw new Error('링크 API 요청 실패');
 

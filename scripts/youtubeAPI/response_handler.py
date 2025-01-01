@@ -76,16 +76,31 @@ class YouTubeResponseHandler:
     
     @staticmethod
     def _parse_video_Ids(response):
+        # response 검증
+        if response is None:
+            print("[ERROR] Response is None.")
+            return []
+
+        if 'items' not in response:
+            print("[ERROR] 'items' key is missing in the response.")
+            return []
+
         video_data = []
         for item in response['items']:
-            if item['id']['kind'] == "youtube#video":
-                video_id = item['id']['videoId']
-                published_time = transform_datetime(item['snippet']['publishedAt']) 
+            # 유효한 YouTube 비디오인지 확인
+            if item.get('id', {}).get('kind') == "youtube#video":
+                video_id = item['id'].get('videoId')
+                published_time = transform_datetime(item['snippet'].get('publishedAt'))
                 video_data.append({
                     "video_id": video_id,
                     "publish_time": published_time
                 })
+
+        if not video_data:
+            print("[WARNING] No valid video IDs found in the response.")
+        
         return video_data
+
 
 
 

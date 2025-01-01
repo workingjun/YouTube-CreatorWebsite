@@ -17,19 +17,19 @@ function loadMoreVideos() {
     isLoading = true;
     showLoading();
 
-    const videoCards = document.querySelectorAll('.video-card.hidden');
-    // 현재 숨겨진 카드 중에서 표시할 갯수만큼 로드
-    for (let i = 0; i < itemsPerLoad && currentIndex < videoCards.length; i++, currentIndex++) {
-        videoCards[currentIndex].classList.remove('hidden');
-    }
+    setTimeout(() => {
+        const videoCards = document.querySelectorAll('.video-card.hidden');
+        for (let i = 0; i < itemsPerLoad && currentIndex < videoCards.length; i++, currentIndex++) {
+            videoCards[currentIndex].classList.remove('hidden');
+        }
 
-    hideLoading();
-    isLoading = false;
+        hideLoading();
+        isLoading = false;
 
-    // 모든 카드가 표시되면 로딩 중단
-    if (currentIndex >= videoCards.length) {
-        window.removeEventListener('scroll', handleScroll);
-    }
+        if (currentIndex >= videoCards.length) {
+            window.removeEventListener('scroll', handleScroll);
+        }
+    }, 200); // 딜레이 시간 설정 (300ms)
 }
 
 // scroll 이벤트 최적화

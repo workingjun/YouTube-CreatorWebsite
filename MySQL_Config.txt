@@ -14,29 +14,23 @@ CREATE DATABASE youtubeDATA;
 
 GRANT ALL PRIVILEGES ON youtubeDATA.* TO 'youtube'@'%';
 
-USE youtubeDATA;
-CREATE TABLE comments (
-    video_id VARCHAR(255) NOT NULL, 
-    author VARCHAR(255) NOT NULL, 
-    text TEXT NOT NULL, 
-    like_count INT NOT NULL, 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+USE YoutubeDATA1;
 
-ALTER TABLE comments
-ADD CONSTRAINT unique_video_id UNIQUE (video_id);
+우정잉
+청산유수현 SUHYEON
+보겸TV
+김 럽미
+지식줄고양
 
-
-CREATE TABLE videoId (
+CREATE TABLE `지식줄고양_IDS` (
     video_id VARCHAR(255) NOT NULL, 
     publish_time DATETIME NOT NULL
 );
 
-ALTER TABLE videoId
+ALTER TABLE `지식줄고양_IDS`
 ADD CONSTRAINT unique_video_id UNIQUE (video_id);
 
-
-CREATE TABLE videoData (
+CREATE TABLE `지식줄고양_VIDEO` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     video_id VARCHAR(255) NOT NULL,
     title TEXT NOT NULL,
@@ -48,21 +42,12 @@ CREATE TABLE videoData (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-ALTER TABLE videoData
-ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255);
-
-
-SET @new_id = 0;
-
-UPDATE videoid
-SET id = (@new_id := @new_id + 1)
-ORDER BY id ASC;
-
-ALTER TABLE videoid AUTO_INCREMENT = 1;
+ALTER TABLE `지식줄고양_VIDEO`
+ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255));
 
 FLUSH PRIVILEGES;
 
-TRUNCATE TABLE logs;
+TRUNCATE TABLE comments;
 
 GRANT ALL PRIVILEGES ON `ytbCreator$YoutubeDATA1`.* TO 'ytbCreator'@'%';
 FLUSH PRIVILEGES;

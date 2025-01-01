@@ -4,9 +4,9 @@ from datetime import datetime
 import math 
 
 class HTMLGenerator:
-    def save_index_to_file(self, output_path, db_manager: MySQLYouTubeDB):
-        last_video_cards = self.make_video_card(db_manager, info_flag=True)
-        video_cards = self.make_video_card(db_manager, info_flag=False)
+    def save_index_to_file(self, output_path, table_name, db_manager: MySQLYouTubeDB):
+        last_video_cards = self.make_video_card(table_name, db_manager, info_flag=True)
+        video_cards = self.make_video_card(table_name, db_manager, info_flag=False)
         self.template = load_template()
         html_output = self.template.format(
             last_video_cards=last_video_cards,
@@ -15,9 +15,9 @@ class HTMLGenerator:
         with open(output_path, "w", encoding="utf-8") as file:
             file.write(html_output)
 
-    def make_video_card(self, db_manager: MySQLYouTubeDB, info_flag=True):
+    def make_video_card(self, table_name, db_manager: MySQLYouTubeDB, info_flag=True):
         # Fetch video data
-        dic_videos = db_manager.fetch_all_videoData()
+        dic_videos = db_manager.fetch_all_videoData(table_name=table_name)
 
         # 조회수가 0 이상인 데이터만 필터링
         dic_videos = [row for row in dic_videos if row.get('view_count', 0) > 0]
@@ -52,7 +52,8 @@ class HTMLGenerator:
                     data-likes="{row['like_count']}"
                     data-trand="{trand_point}"
                     data-video-id="{row['video_id']}"
-                    data-is-shorts="{row['is_shorts']}">
+                    data-is-shorts="{row['is_shorts']}"
+                    data-group="{table_name}">
                     <div class="thumbnail-container">
                         <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" 
                             alt="썸네일" 
