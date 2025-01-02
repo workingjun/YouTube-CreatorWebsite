@@ -1,6 +1,6 @@
 // 모든 섹션과 메뉴 항목 가져오기
 const sections = document.querySelectorAll('#channel-info, #recent-videos, #popular-videos-container');
-const navLinks = document.querySelectorAll('.menu ul li a');
+const navLinks = document.querySelectorAll('.bottom-bar ul li a');
 
 // 스크롤 위치에 따라 활성화 업데이트
 function updateActiveLink() {

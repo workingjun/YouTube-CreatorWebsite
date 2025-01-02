@@ -1,7 +1,6 @@
 from flask import jsonify, Blueprint, request
 from scripts.youtube_website import YOUTUBECreatorWebsite
 from config.api_config import get_api_key
-from config.channelid_config import CHANNELID
 
 # Define Blueprints for each channel
 comments_bp_1 = Blueprint('friendshiping_comments', __name__, url_prefix='/friendshiping')
@@ -18,7 +17,7 @@ def get_comments(channel_name, video_id):
     try:
         youtube_creator = YOUTUBECreatorWebsite(
             api_key=get_api_key(6),
-            channelID=CHANNELID[channel_name]
+            channelName=channel_name
         )
         comments = youtube_creator.youtube_manager.api_manager.get_comments(video_id=video_id)
         return jsonify(comments)  # Return comments in JSON format

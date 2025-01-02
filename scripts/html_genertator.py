@@ -1,7 +1,7 @@
-from scripts.utils.utils import load_template
+from scripts.utils.utils import load_template, load_main
 from DB.database import MySQLYouTubeDB
 from datetime import datetime
-import math 
+import math
 
 class HTMLGenerator:
     def save_index_to_file(self, output_path, table_name, db_manager: MySQLYouTubeDB):
@@ -14,7 +14,7 @@ class HTMLGenerator:
             )
         with open(output_path, "w", encoding="utf-8") as file:
             file.write(html_output)
-
+        
     def make_video_card(self, table_name, db_manager: MySQLYouTubeDB, info_flag=True):
         # Fetch video data
         dic_videos = db_manager.fetch_all_videoData(table_name=table_name)
@@ -44,33 +44,30 @@ class HTMLGenerator:
             trand_point = Engagement_Rate * math.exp(-elapsed_hours / half_life)
 
             # Append HTML for the video card
-            video_cards_list.append(f"""
-                <div class="{hidden_text}" 
-                    data-date="{publish_time}" 
-                    data-comments="{row['comment_count']}"
-                    data-views="{row['view_count']}"
-                    data-likes="{row['like_count']}"
-                    data-trand="{trand_point}"
-                    data-video-id="{row['video_id']}"
-                    data-is-shorts="{row['is_shorts']}"
-                    data-group="{table_name}">
-                    <div class="thumbnail-container">
-                        <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" 
-                            alt="썸네일" 
-                            class="thumbnail">
-                        <div class="play-button">▶</div>
-                        <iframe style="display: none;" frameborder="0" allowfullscreen></iframe>
-                    </div>
-                    <h3><a href="#" class="open-modal-link" data-video-id="{row['video_id']}">{row['title']}</a></h3>
-                    <p><strong>조회수:</strong> {view_count}</p>
-                    <p><strong>좋아요 수:</strong> {like_count}</p>
-                    <p><strong>댓글 수:</strong> {comment_count}</p>
-                    <p><strong>게시 시간:</strong> {publish_time}</p>
-                    <a href="https://www.youtube.com/watch?v={row['video_id']}" target="_blank">동영상 보러가기</a>
+            video_cards_list.append(f"""<div class="{hidden_text}" 
+                data-date="{publish_time}" 
+                data-comments="{row['comment_count']}"
+                data-views="{row['view_count']}"
+                data-likes="{row['like_count']}"
+                data-trand="{trand_point}"
+                data-video-id="{row['video_id']}"
+                data-is-shorts="{row['is_shorts']}"
+                data-group="{table_name}">
+                <div class="thumbnail-container">
+                    <img src="https://i.ytimg.com/vi/{row['video_id']}/hqdefault.jpg" 
+                        alt="썸네일" 
+                        class="thumbnail">
+                    <div class="play-button">▶</div>
+                    <iframe style="display: none;" frameborder="0" allowfullscreen></iframe>
                 </div>
+                <h3><a href="#" class="open-modal-link" data-video-id="{row['video_id']}">{row['title']}</a></h3>
+                <p><strong>조회수:</strong> {view_count}</p>
+                <p><strong>좋아요 수:</strong> {like_count}</p>
+                <p><strong>댓글 수:</strong> {comment_count}</p>
+                <p><strong>게시 시간:</strong> {publish_time}</p>
+                <a href="https://www.youtube.com/watch?v={row['video_id']}" target="_blank">동영상 보러가기</a>
+            </div>
             """)
 
         # Combine all video cards into a single HTML string
         return "".join(video_cards_list)
-
-

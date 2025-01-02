@@ -7,16 +7,6 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     </head>
     <body>
-        <header>
-            <div class="menu">
-                <ul>
-                    <li><a href="#channel-info" class="active">채널정보</a></li>
-                    <li><a href="#recent-videos">최근영상</a></li>
-                    <li><a href="#popular-videos-container">채널영상</a></li>
-                </ul>
-            </div>
-        </header>
-        
         <div class="container">
             <!-- 채널 정보 섹션 -->
             <div class="channel-info" id="channel-info">
@@ -36,26 +26,37 @@
                     <div id="link-list" class="link-grid"></div>
                 </div>
             </div>
-        
+        </div>
+
+        <div class="container">
             <!-- 최근 동영상 조회 결과 -->
             <div class="video-cards" id="recent-videos">
                 {last_video_cards}
             </div>
-        
-            <!-- 영상 인기순 정렬 결과 -->
-            <div class="custom-dropdown" id="popular-videos">
-                <select id="sortCriteria" onchange="handleSortChange()">
-                    <option value="date">기본</option>
-                    <option value="trand">최근 트렌드</option>
-                    <option value="views">조회수순</option>
-                    <option value="likes">좋아요순</option>
-                    <option value="comments">댓글순</option>
-                    <option value="is-shorts">Only Shorts</option>
-                </select>
-            </div>
+        </div>
+
+        <div class="container">
             <div class="video-cards" id="popular-videos-container">
                 {video_cards}
             </div>
+        </div>
+    
+        <div class="bottom-bar">
+            <ul>
+                <li><a href="#channel-info" class="active">채널정보</a></li>
+                <li><a href="#recent-videos">최근영상</a></li>
+                <li><a href="#popular-videos-container">채널영상</a></li>
+                <li>
+                    <select class="sort-select" id="sortCriteria" onchange="handleSortChange()">
+                        <option value="date">기본</option>
+                        <option value="trand">최근 트렌드</option>
+                        <option value="views">조회수순</option>
+                        <option value="likes">좋아요순</option>
+                        <option value="comments">댓글순</option>
+                        <option value="is-shorts">Only Shorts</option>
+                    </select>
+                </li>
+            </ul>
         </div>
 
         <!-- 로딩 스피너 -->

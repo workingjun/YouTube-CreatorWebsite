@@ -6,8 +6,6 @@ body {
     padding: 0;
     box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 계산 */
 }
-
-/* 기본 컨테이너 스타일 */
 .container {
     width: 100%; /* 기본적으로 화면 전체를 채움 */
     margin: 20px auto; /* 수직 중앙 정렬 및 수평 중앙 정렬 */
@@ -17,19 +15,19 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 메뉴 스타일 */
-.menu {
+.bottom-bar {
     position: fixed;
-    top: 0;
+    bottom: 0;
     width: 100%;
-    background-color: #ffffff;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #ddd;
     padding: 10px 0;
+    z-index: 1000;
 }
-
-.menu ul {
+.bottom-bar ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -37,35 +35,59 @@ body {
     justify-content: center;
     gap: 20px;
 }
-
-.menu ul li a {
+.bottom-bar ul li a {
     text-decoration: none;
     color: #007BFF;
     font-weight: bold;
-    padding: 10px 15px; /* 클릭 영역 확장 */
-    border-radius: 5px; /* 버튼 느낌 추가 */
-    transition: background-color 0.3s, color 0.3s;
+    padding: 10px 15px;
+    border-radius: 5px;
+    height: 40px; /* 드롭다운과 동일한 높이 */
+    display: flex; /* Flexbox로 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: center; /* 텍스트 중앙 정렬 */
+    box-sizing: border-box; /* 패딩 포함 높이 계산 */
 }
-
-.menu ul li a.active {
+.bottom-bar ul li a.active {
     color: #ffffff;          /* 활성화된 텍스트 색상 */
     background-color: #007BFF; /* 활성화된 배경색 */
     border-radius: 5px;      /* 둥근 모양 */
 }
 
-/* 채널 정보 스타일 */
+.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="gray"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    height: 40px; /* 버튼 높이와 동일하게 설정 */
+    box-sizing: border-box; /* 패딩 포함 높이 계산 */
+}
+
+  
+.sort-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+  
 .channel-info {
     text-align: center;
     margin-bottom: 40px; /* 아래 여백 */
 }
-
 .channel-info img.thumbnail {
     width: 120px;
     height: auto;
     border-radius: 50%;
     margin-bottom: 10px;
 }
-
 .channel-info p {
     margin: 5px 0;
     font-size: 1em;
@@ -80,7 +102,6 @@ body {
     gap: 10px; /* 카드 간격 축소 */
     padding: 0; /* 여백 제거 */
 }
-
 .video-card-info,
 .video-card {
     flex: 1 1 calc(100% - 20px); /* 기본 카드 크기 */
@@ -97,21 +118,17 @@ body {
     flex-direction: column;
     align-items: center;
 }
-
 .video-card-info iframe,
 .video-card iframe {
     width: 100%; /* 부모 폭 채우기 */
     height: 400px; /* 기본 고정 높이 */
     border: none;
 }
-
 .video-card-info:hover,
 .video-card:hover {
     transform: translateY(-5px); /* 마우스 호버 시 살짝 위로 이동 */
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
-
-/* 카드 이미지와 텍스트 간 조화 */
 .video-card-info img,
 .video-card img {
     max-width: 100%;
@@ -119,7 +136,6 @@ body {
     border-radius: 5px;
     margin-bottom: 10px;
 }
-
 .video-card-info h3,
 .video-card h3 {
     font-size: 1.2em;
@@ -132,7 +148,6 @@ body {
     -webkit-box-orient: vertical; /* 수직 방향 설정 */
     white-space: normal; /* 줄바꿈 허용 */
 }
-
 .video-card-info p,
 .video-card p {
     font-size: 0.9em;
@@ -149,7 +164,6 @@ body {
     gap: 10px; /* 드롭다운과 다른 요소 간격 */
     margin: 40px 20px 20px 20px; /* 위쪽 30px, 아래쪽 40px */
 }
-
 .custom-dropdown select {
     padding: 10px 15px; /* 내부 여백 */
     border-radius: 5px; /* 둥근 테두리 */
@@ -162,77 +176,22 @@ body {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* 약간의 그림자 */
     outline: none; /* 클릭 시 테두리 제거 */
 }
-
 .custom-dropdown select:hover {
     border-color: #007BFF; /* hover 시 강조된 테두리 색상 */
     background-color: #f0f8ff; /* hover 시 배경색 약간 밝게 */
 }
-
 .custom-dropdown select:focus {
     border-color: #0056b3; /* 클릭 시 테두리 강조 */
     box-shadow: 0px 0px 8px rgba(0, 91, 187, 0.5); /* 클릭 시 외부 그림자 */
     background-color: #e6f3ff; /* 클릭 시 배경색 */
 }
-
 .custom-dropdown select option {
     color: #333; /* 옵션 텍스트 색상 */
     background-color: #fff; /* 옵션 배경색 */
     padding: 8px; /* 옵션 내부 여백 */
 }
 
-/* 흐린 배경 */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 흐린 배경 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-/* 모달 창 */
-.modal-content {
-    background-color: #fff;
-    width: 80%;
-    max-width: 600px;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    position: relative;
-    text-align: left;
-}
-
-/* 댓글 스타일 */
-.modal-body {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.modal-body .comment {
-    margin-bottom: 15px;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-/* 닫기 버튼 */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-}
-
-.close:hover {
-    color: #007BFF;
-}
-
+/* 커멘트 로딩 스핀 */
 #loading-spinner {
     position: fixed;
     top: 50%;
@@ -246,13 +205,11 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 .spinner {
     position: relative;
     width: 50px;
     height: 50px;
 }
-
 .spinner::before,
 .spinner::after {
     content: "";
@@ -265,19 +222,16 @@ body {
     border-radius: 50%;
     animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
-
 .spinner::before {
     border-top: 3px solid #3498db; /* Blue */
     border-bottom: 3px solid #3498db; /* Blue */
     animation-delay: 0s;
 }
-
 .spinner::after {
     border-left: 3px solid #f1c40f; /* Yellow */
     border-right: 3px solid #f1c40f; /* Yellow */
     animation-delay: 0.75s;
 }
-
 @keyframes spin {
     0% {
         transform: rotate(0deg);
@@ -286,12 +240,8 @@ body {
         transform: rotate(360deg);
     }
 }
-  
-#links-section {
-    text-align: center;
-    margin: 20px;
-}
 
+/*로딩 액션*/
 #loading {
     position: fixed;
     bottom: 10px;
@@ -309,8 +259,6 @@ body {
     z-index: 9999;
     opacity: 0; /* 애니메이션 시작 전 */
 }
-
-/* 페이드 인 애니메이션 */
 @keyframes fadeIn {
     0% {
         opacity: 0;
@@ -319,8 +267,6 @@ body {
         opacity: 1;
     }
 }
-
-/* 부드러운 위아래 움직임 애니메이션 */
 @keyframes bounce {
     0%, 100% {
         transform: translateX(-50%) translateY(0);
@@ -334,7 +280,11 @@ body {
     display: none; 
 }
 
-/* 기본 설정 */
+/* 링크 설정 */
+#links-section {
+    text-align: center;
+    margin: 20px;
+}
 .link-grid {
     display: flex;
     flex-direction: row; /* 기본적으로 가로 배치 */
@@ -342,8 +292,6 @@ body {
     flex-wrap: wrap; /* 필요 시 줄바꿈 */
     gap: 15px; /* 간격 조정 */
 }
-
-/* 링크 아이템 */
 .link-item {
     max-width: 250px; /* 최대 너비 제한 */
     padding: 12px; /* 여백 증가 */
@@ -359,19 +307,16 @@ body {
     color: #333;
     transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
-
 .link-item img {
     width: 32px;
     height: 32px;
     margin-right: 10px;
     border-radius: 50%;
 }
-
 .link-item:hover {
     background-color: #f0f8ff;
     transform: scale(1.05); /* 호버 시 살짝 확대 */
 }
-
 .link-item span {
     flex: 1; /* 텍스트를 남은 공간에 맞춤 */
     font-weight: 500; /* 텍스트 두께 조정 */

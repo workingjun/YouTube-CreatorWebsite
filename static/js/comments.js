@@ -1,3 +1,22 @@
+// 그룹별 API 경로를 결정하는 함수
+function getApiUrl(group) {
+    if (group.includes('우정잉')) {
+        return `friendshiping`;
+    } else if (group.includes('청산유수현 SUHYEON')) {
+        return `suhyeon`;
+    }
+    else if (group.includes('보겸TV')) {
+        return `bokyem`;
+    }
+    else if (group.includes('김 럽미')) {
+        return `loveme`;
+    }
+    else if (group.includes('지식줄고양')) {
+        return `cat`;
+    }
+    return basePath; // 기본 경로
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const videoCards = document.querySelectorAll('.video-card, .video-card-info');
 
@@ -15,9 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const loadingSpinner = document.getElementById('loading-spinner');
             loadingSpinner.style.display = 'flex';
 
+            const comments_url = `/${getApiUrl(group)}/comments?videoId=${videoId}`;
+
             try {
                 // 댓글 데이터 가져오기 (Flask API 호출)
-                const response = await fetch(`/${group}/comments?videoId=${videoId}`);
+                const response = await fetch(comments_url);
                 const comments = await response.json();
 
                 // 댓글 모달 생성

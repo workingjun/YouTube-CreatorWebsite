@@ -5,7 +5,8 @@ from config.api_config import get_api_key
 from config.channelid_config import CHANNELID
 from routes.comments import comments_bp_1, comments_bp_2, comments_bp_3, comments_bp_4, comments_bp_5
 from scripts.youtube_website import YOUTUBECreatorWebsite
-    
+from scripts.utils.utils import save_mainindex_to_file
+
 app = Flask(__name__, static_folder='static', template_folder='templates')
 
 # Register Blueprint for comments
@@ -137,6 +138,7 @@ def teardown(exception):
 
 @app.route('/')
 def index():
+    save_mainindex_to_file()
     return render_template('main.html')  # Render updated template
     
 @app.route('/friendshiping')
