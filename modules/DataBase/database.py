@@ -265,8 +265,18 @@ class VideoIdManager(BaseDatabaseManager):
         return result
            
 class ChannelInfoManager(BaseDatabaseManager):
-    def upsert_channel_info(self, data_list):
+    def upsert_channel_info(self, data):
         print("[INFO] Inserting or updating channelInfo in youtube_channels:")
+        
+        params = (
+            data["title"],
+            data["channel_id"],
+            data["thumbnail"],
+            data["description"],
+            data["subscriber_count"],
+            data["video_count"],
+            data["views_count"],
+        )
         
         # Prepare SQL query for upsert
         sql = """
@@ -280,7 +290,7 @@ class ChannelInfoManager(BaseDatabaseManager):
             video_count = VALUES(video_count),
             views_count = VALUES(views_count)
         """
-        self.execute_query(sql, data_list)
+        self.execute_query(sql, params)
         print("[SUCCESS] channelInfo processed in youtube_channels")
     
     def fetch_channel_info(self, title):

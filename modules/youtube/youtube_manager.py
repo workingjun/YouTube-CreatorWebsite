@@ -19,7 +19,7 @@ class YouTubeManager:
             video_ids = [row['video_id'] for row in db_manager.fetch_videoIds(table_name=table_name)] 
         
         results = self.api_manager.get_channel_information()
-        db_manager.upsert_channel_info(data_list=results)
+        db_manager.upsert_channel_info(data=results)
 
         video_data = []
         for video_id in video_ids:

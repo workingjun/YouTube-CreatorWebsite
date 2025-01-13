@@ -139,8 +139,7 @@ def render_channel(channel_name):
         creator.update_index_html(
             index_path=output_path,
             db_manager=g.db_manager,
-            update_video_ids=True,
-            ChannelInfo_filepath=json_path
+            update_video_ids=True
         )
         return render_template(creator_data["html"])
     except Exception as e:

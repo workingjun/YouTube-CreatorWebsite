@@ -10,7 +10,7 @@ class YOUTUBECreatorWebsite:
         self.api_key = api_key
         self.youtube_manager = YouTubeManager(api_key=self.api_key, channelID=self.channelID)
 
-    def update_index_html(self, index_path, ChannelInfo_filepath, db_manager, update_video_ids:bool):
+    def update_index_html(self, index_path, db_manager, update_video_ids:bool):
         """Updates the index.html with the latest channel data"""
         # Collect partial video data
         self.youtube_manager.collect_data(db_manager=db_manager, table_name=self.channelName, update_video_ids=update_video_ids)

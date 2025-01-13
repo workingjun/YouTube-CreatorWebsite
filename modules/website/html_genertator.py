@@ -21,6 +21,10 @@ def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTube
     
 def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
     result = db_manager.fetch_channel_info(title=table_name)
+    subscriber_count = format(result['subscriber_count'], ",")
+    view_count = format(result['views_count'], ",")
+    video_count = format(result['video_count'], ",")
+
     return f"""<!-- 채널 정보 섹션 -->
         <div class="channel-info" id="channel-info">
             <h2>채널 정보</h2>
@@ -30,15 +34,16 @@ def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
                 </a>
             </p>
             <p>채널 이름: {result["title"]}</p>
-            <p>구독자 수: {result["subscriber_count"]}</p>
+            <p>구독자 수: {subscriber_count}</p>
             <p>채널 설명: {result["description"]}</p>
-            <p>전체 조회 수: {result["views_count"]}</p>
-            <p>동영상 수: {result["video_count"]}</p>
+            <p>전체 조회 수: {view_count}</p>
+            <p>동영상 수: {video_count}</p>
             <div id="links-section">
                 <h3>링크</h3>
                 <div id="link-list" class="link-grid"></div>
             </div>
         </div>"""
+
 
 def make_video_card(table_name, db_manager: MySQLYouTubeDB, info_flag=True):
     # Fetch video data
