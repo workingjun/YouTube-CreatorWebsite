@@ -1,0 +1,6 @@
+sshtunnel
+pymysql
+selenium
+chromedriver_autoinstaller
+google-api-python-client
+flask
