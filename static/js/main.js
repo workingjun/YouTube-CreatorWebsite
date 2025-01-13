@@ -10,6 +10,7 @@ import { closeCommentsModal } from "./comments.js";
 async function handleSortChange() {
     const criteria = document.getElementById("sortCriteria").value;
     sortVideos(criteria);
+    
 }
 
 // DOMContentLoaded 이벤트로 DOM이 로드된 후 초기화

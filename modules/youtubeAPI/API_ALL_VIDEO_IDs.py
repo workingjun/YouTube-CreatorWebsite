@@ -45,7 +45,7 @@ def fetch_all_playlist_items(youtube, playlist_ids):
                 published_time = item["snippet"]["publishedAt"]
                 all_video_data.append({
                     "video_id": video_id,
-                    "published_time": published_time
+                    "publish_time": published_time
                 })
 
             # 다음 페이지로 이동
@@ -61,12 +61,14 @@ def fetch_shorts_videos(youtube, channel_id):
 
     while True:
         # 비디오 검색 API 호출 (최대 50개, 페이지 토큰을 사용해 반복)
+        # 비디오 검색 API 호출 (최신순 정렬 추가)
         response = youtube.search().list(
             part="snippet",
             channelId=channel_id,
             maxResults=50,
             pageToken=next_page_token,
-            type="video"
+            type="video",
+            order="date"  # 최신순 정렬
         ).execute()
 
         # 비디오 ID 및 정보 저장

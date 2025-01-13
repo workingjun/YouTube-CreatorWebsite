@@ -1,5 +1,10 @@
 import pymysql, time
-from config.db_config import DB_CONFIG_DEFAULT, DB_CONFIG_SSH , SSH_HOST, SSH_PASSWORD, SSH_USER, MYSQL_HOST
+from config.db_config import MYSQL_HOST
+from config.db_config import SSH_USER
+from config.db_config import SSH_PASSWORD
+from config.db_config import SSH_HOST
+from config.db_config import DB_CONFIG_SSH
+from config.db_config import DB_CONFIG_DEFAULT
 
 class BaseDatabaseManager:
     _shared_connection = None
@@ -259,6 +264,37 @@ class VideoIdManager(BaseDatabaseManager):
         print(f"[SUCCESS] Fetched all video IDs from {table_name}")
         return result
            
-class MySQLYouTubeDB(VideoDataManager, VideoIdManager):
+class ChannelInfoManager(BaseDatabaseManager):
+    def upsert_channel_info(self, data_list):
+        print("[INFO] Inserting or updating channelInfo in youtube_channels:")
+        
+        # Prepare SQL query for upsert
+        sql = """
+        INSERT INTO youtube_channels (title, channel_id, thumbnail, description, subscriber_count, video_count, views_count)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+            title = VALUES(title),
+            thumbnail = VALUES(thumbnail),
+            description = VALUES(description),
+            subscriber_count = VALUES(subscriber_count),
+            video_count = VALUES(video_count),
+            views_count = VALUES(views_count)
+        """
+        self.execute_query(sql, data_list)
+        print("[SUCCESS] channelInfo processed in youtube_channels")
+    
+    def fetch_channel_info(self, title):
+        
+        print(f"[INFO] Fetching channelInfo for title: {title}")
+        sql = "SELECT * FROM youtube_channels WHERE title = %s"
+
+        result = self.fetch_one(sql, (title,))
+        print(f"[SUCCESS] Fetched channelInfo for title: {title}")
+        return result
+        
+    
+
+        
+class MySQLYouTubeDB(VideoDataManager, VideoIdManager, ChannelInfoManager):
     """댓글과 비디오 데이터를 모두 관리하는 클래스"""
     pass

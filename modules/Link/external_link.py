@@ -1,7 +1,7 @@
-from selenium.webdriver.common.by import By
-from scripts.Link.Chrome import ChromeManager
-from time import sleep
 import json
+from time import sleep
+from selenium.webdriver.common.by import By
+from modules.Link.Chrome import ChromeManager
 from config.channelid_config import CHANNELID
 
 def collect_creators(channel_name):

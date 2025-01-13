@@ -18,9 +18,11 @@ function loadMoreVideos() {
     showLoading();
 
     setTimeout(() => {
-        const videoCards = document.querySelectorAll('.video-card.hidden');
+        const videoCards = document.querySelectorAll('.video-card'); // 전체 비디오 카드
         for (let i = 0; i < itemsPerLoad && currentIndex < videoCards.length; i++, currentIndex++) {
-            videoCards[currentIndex].classList.remove('hidden');
+            if (videoCards[currentIndex].classList.contains('hidden')) {
+                videoCards[currentIndex].classList.remove('hidden');
+            }
         }
 
         hideLoading();
@@ -29,7 +31,7 @@ function loadMoreVideos() {
         if (currentIndex >= videoCards.length) {
             window.removeEventListener('scroll', handleScroll);
         }
-    }, 200); // 딜레이 시간 설정 (300ms)
+    }, 200);
 }
 
 // scroll 이벤트 최적화

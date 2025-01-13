@@ -1,7 +1,6 @@
-from DB.database import MySQLYouTubeDB
-from config.api_config import api_key
-from scripts.youtubeAPI.api_manager import YoutubeApiManager
 import json
+from modules.youtubeAPI.api_manager import YoutubeApiManager
+from modules.DataBase.database import MySQLYouTubeDB
 
 class YouTubeManager:
     def __init__(self, api_key, channelID=None, channel_name=None):
@@ -18,19 +17,18 @@ class YouTubeManager:
             video_ids = [row['video_id'] for row in video_ids_list]
         else:
             video_ids = [row['video_id'] for row in db_manager.fetch_videoIds(table_name=table_name)] 
+        
+        results = self.api_manager.get_channel_information()
+        db_manager.upsert_channel_info(data_list=results)
+
         video_data = []
         for video_id in video_ids:
             stats = self.api_manager.get_video_statistics(video_id)
             if stats is None:
                 continue
             video_data.append(stats)
+        
         batch_size = 100  # 한 번에 처리할 데이터 크기
         for i in range(0, len(video_data), batch_size):
             batch = video_data[i:i+batch_size]
             db_manager.upsert_videoData(table_name=table_name, video_data_list=batch)
-    
-    def save_channel_information(self, ChannelInfo_filepath):
-        results = self.api_manager.get_channel_information()
-        with open(ChannelInfo_filepath, "w", encoding="utf-8") as file:
-            json.dump(results, file, ensure_ascii=False, indent=4)
-        return results

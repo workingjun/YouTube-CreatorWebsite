@@ -42,6 +42,17 @@ CREATE TABLE `지식줄고양_VIDEO` (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE youtube_channels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255),
+    channel_id VARCHAR(255),
+    thumbnail TEXT,
+    description TEXT,
+    subscriber_count INT,
+    video_count INT,
+    views_count BIGINT
+);
+
 ALTER TABLE `지식줄고양_VIDEO`
 ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255));
 
@@ -49,7 +60,5 @@ FLUSH PRIVILEGES;
 
 TRUNCATE TABLE comments;
 
-GRANT ALL PRIVILEGES ON `ytbCreator$YoutubeDATA1`.* TO 'ytbCreator'@'%';
-FLUSH PRIVILEGES;
 
 

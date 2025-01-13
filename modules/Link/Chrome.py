@@ -1,7 +1,7 @@
-import chromedriver_autoinstaller
-from selenium import webdriver
 import os
 import subprocess
+import chromedriver_autoinstaller
+from selenium import webdriver
 
 class ChromeManager:
     chrome_path_case1 = r'C:\Program Files\Google\Chrome\Application\chrome.exe'
