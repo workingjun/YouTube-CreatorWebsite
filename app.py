@@ -3,8 +3,9 @@ from flask import Flask, render_template, jsonify, g
 from config.api_config import get_api_key
 from routes.comments import comments_bp
 from routes.link_routes import links_bp
-from modules.DataBase.database import MySQLYouTubeDB
-from modules.youtube.youtube_website import YOUTUBECreatorWebsite
+from modules.database import MySQLYouTubeDB
+from modules.Youtube import YOUTUBECreatorWebsite
+from modules.Youtube import save_main_index_to_file
 
 # Flask 애플리케이션 생성
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -150,6 +151,7 @@ def render_channel(channel_name):
 @app.route('/')
 def index():
     """메인 페이지 렌더링"""
+    save_main_index_to_file(db_manager)
     return render_template('main.html')
 
 # WSGI 서버 초기화

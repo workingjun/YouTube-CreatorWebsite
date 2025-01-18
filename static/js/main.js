@@ -3,7 +3,6 @@ import './sorting.js';
 import './play.js';
 import './comments.js';
 import './loading.js';
-import './channel_info.js';
 import { sortVideos } from './sorting.js';
 import { closeCommentsModal } from "./comments.js";
 

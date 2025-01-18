@@ -1,10 +1,10 @@
 import math
 import os, json
 from datetime import datetime
-from modules.Utils.utils import get_url
-from modules.Utils.utils import load_main
-from modules.Utils.utils import load_template
-from modules.DataBase.database import MySQLYouTubeDB
+from modules.utiles.scripts.transform import get_url
+from modules.utiles.scripts.template import load_main
+from modules.utiles.scripts.template import load_template
+from modules.database.scripts.main import MySQLYouTubeDB
 
 def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTubeDB):
     last_video_cards = make_video_card(table_name, db_manager, info_flag=True)
@@ -20,30 +20,41 @@ def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTube
         file.write(html_output)
     
 def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
-    result = db_manager.fetch_channel_info(title=table_name)
-    subscriber_count = format(result['subscriber_count'], ",")
-    view_count = format(result['views_count'], ",")
-    video_count = format(result['video_count'], ",")
+    result_channelInfo = db_manager.fetch_channel_info(title=table_name)
+    result_Links = db_manager.fetch_Links(table_name)
+    subscriber_count = format(result_channelInfo['subscriber_count'], ",")
+    view_count = format(result_channelInfo['views_count'], ",")
+    video_count = format(result_channelInfo['video_count'], ",")
 
+    Links_html = ""
+    for row in result_Links:
+        Links_html += f"""
+            <a class="link-item" href="{row["external_link"]}" target="_blank" rel="nofollow noopener noreferrer">
+                <img src="{row["image_link"]}" loading="lazy">
+                <span>"{row["name"]}"</span>
+            </a>"""
+        
     return f"""<!-- 채널 정보 섹션 -->
         <div class="channel-info" id="channel-info">
             <h2>채널 정보</h2>
             <p>
-                <a id="channel-link" href="#" target="_blank">
-                    <img src="{result["thumbnail"]}" alt="채널 썸네일" class="thumbnail">
+                <a id="channel-link" 
+                href="https://www.youtube.com/channel/{result_channelInfo["channel_id"]}" 
+                target="_blank">
+                    <img src="{result_channelInfo["thumbnail"]}" alt="채널 썸네일" class="thumbnail">
                 </a>
             </p>
-            <p>채널 이름: {result["title"]}</p>
+            <p>채널 이름: {result_channelInfo["title"]}</p>
             <p>구독자 수: {subscriber_count}</p>
-            <p>채널 설명: {result["description"]}</p>
+            <p>채널 설명: {result_channelInfo["description"]}</p>
             <p>전체 조회 수: {view_count}</p>
             <p>동영상 수: {video_count}</p>
-            <div id="links-section">
-                <h3>링크</h3>
-                <div id="link-list" class="link-grid"></div>
+            <div class="links-section">
+                <div class="links-list">
+                    {Links_html}
+                </div>
             </div>
         </div>"""
-
 
 def make_video_card(table_name, db_manager: MySQLYouTubeDB, info_flag=True):
     # Fetch video data
@@ -102,26 +113,15 @@ def make_video_card(table_name, db_manager: MySQLYouTubeDB, info_flag=True):
     # Combine all video cards into a single HTML string
     return "".join(video_cards_list)
     
-def save_main_index_to_file():
-    # JSON 파일이 저장된 폴더 경로
-    folder_path = "json/"
-
+def save_main_index_to_file(db_manager: MySQLYouTubeDB):
     # 폴더 내 모든 JSON 파일 읽기
-    json_data_list = []
+    data_list = []
     info_cards_list = []
 
-    for filename in os.listdir(folder_path):
-        if filename.endswith("ChannelInfo.json"):  # 확장자가 .json인 파일만 읽기
-            file_path = os.path.join(folder_path, filename)
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    data = json.load(file)  # JSON 파일 읽기
-                    json_data_list.append(data)  # 데이터를 리스트에 추가
-            except Exception as e:
-                print(f"Error reading {filename}: {e}")
+    data_list = db_manager.fetch_all_channel_info()
 
     # 모든 JSON 데이터 출력
-    for data in json_data_list:
+    for data in data_list:
         view_count = format(data['views_count'], ",")
         video_count = format(data['video_count'], ",")
         subscriber_count = format(data['subscriber_count'], ",")

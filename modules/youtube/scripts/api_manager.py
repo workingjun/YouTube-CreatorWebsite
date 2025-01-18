@@ -1,5 +1,5 @@
 from googleapiclient.discovery import build
-from modules.youtubeAPI.response_handler import YouTubeResponseHandler 
+from modules.Youtube.scripts.response_handler import YouTubeResponseHandler 
 
 class YoutubeApiManager:
     def __init__(self, api_key, channelID=None, channel_name=None):

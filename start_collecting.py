@@ -1,36 +1,46 @@
-from googleapiclient.discovery import build
 from config.api_config import get_api_key
+from googleapiclient.discovery import build
 from config.channelid_config import CHANNELID
-from modules.Link.external_link import collect_creators
-from modules.DataBase.database import MySQLYouTubeDB
-from modules.youtube.youtube_manager import YouTubeManager
-from modules.youtubeAPI.API_ALL_VIDEO_IDs import fetch_all_playlist_items
-from modules.youtubeAPI.API_ALL_VIDEO_IDs import fetch_shorts_videos
-from modules.youtubeAPI.API_ALL_VIDEO_IDs import fetch_all_playlists
+from modules.database import MySQLYouTubeDB
+from modules.links import collect_creators
+from modules.Youtube import YouTubeManager
+from modules.Youtube import fetch_shorts_videos
+from modules.Youtube import fetch_all_playlists
+from modules.Youtube import fetch_all_playlist_items
 
-def collect_creators(channel_name, api_key_num):
+def collect_creators(db_manager, channel_name, api_key_num):
     youtube_manager = YouTubeManager(
         channelID=CHANNELID[channel_name],
         api_key=get_api_key(api_key_num)
         )
-    result = youtube_manager.save_channel_information(
-        ChannelInfo_filepath=f"./json/{channel_name}_ChannelInfo.json"
-        )
     youtube_manager.collect_data(
         update_video_ids=False, 
         db_manager=db_manager,
-        table_name=result["title"]
+        table_name=channel_name
         )
-
+    
+def collect_creators_channelInfo(db_manager, channel_name, api_key_num):
+    youtube_manager = YouTubeManager(
+        channelID=CHANNELID[channel_name],
+        api_key=get_api_key(api_key_num)
+        )
+    youtube_manager.collect_channelInfo(db_manager)
+    
 if __name__=="__main__":
     db_manager = MySQLYouTubeDB()
     db_manager.connect(ssh_flags=True)
     
-    #collect_creators("보겸", 7)
-    #collect_creators("김럽미", 7)
-    #collect_creators("유수현", 7)
-    #collect_creators("지식줄고양", 7)
-    #collect_creators("우정잉", 8)
+    #collect_creators(db_manager, "보겸TV", 8)
+    #collect_creators(db_manager, "김 럽미", 8)
+    #collect_creators(db_manager, "청산유수현 SUHYEON", 8)
+    #collect_creators(db_manager, "지식줄고양", 8)
+    #collect_creators(db_manager, "우정잉", 8)
+
+    #collect_creators_channelInfo(db_manager, "보겸TV", 8)
+    #collect_creators_channelInfo(db_manager, "김 럽미", 8)
+    #collect_creators_channelInfo(db_manager, "청산유수현 SUHYEON", 8)
+    #collect_creators_channelInfo(db_manager, "지식줄고양", 8)
+    #collect_creators_channelInfo(db_manager, "우정잉", 8)
     
     #youtube = build("youtube", "v3", developerKey=get_api_key(8))
     

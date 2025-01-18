@@ -1,6 +1,5 @@
-import json
-from modules.youtubeAPI.api_manager import YoutubeApiManager
-from modules.DataBase.database import MySQLYouTubeDB
+from modules.Youtube.scripts.api_manager import YoutubeApiManager
+from modules.database.scripts.main import MySQLYouTubeDB
 
 class YouTubeManager:
     def __init__(self, api_key, channelID=None, channel_name=None):
@@ -32,3 +31,7 @@ class YouTubeManager:
         for i in range(0, len(video_data), batch_size):
             batch = video_data[i:i+batch_size]
             db_manager.upsert_videoData(table_name=table_name, video_data_list=batch)
+
+    def collect_channelInfo(self, db_manager: MySQLYouTubeDB):
+        results = self.api_manager.get_channel_information()
+        db_manager.upsert_channel_info(data=results)

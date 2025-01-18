@@ -1,6 +1,6 @@
 from config.api_config import get_api_key
 from flask import jsonify, Blueprint, request
-from modules.youtube.youtube_website import YOUTUBECreatorWebsite
+from modules.Youtube import YOUTUBECreatorWebsite
 
 # Define a single Blueprint for comments
 comments_bp = Blueprint('comments', __name__, url_prefix='/<channel_name>')
