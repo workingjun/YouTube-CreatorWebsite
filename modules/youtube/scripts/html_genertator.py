@@ -1,7 +1,5 @@
 import math
-import os, json
 from datetime import datetime
-from modules.utiles.scripts.transform import get_url
 from modules.utiles.scripts.template import load_main
 from modules.utiles.scripts.template import load_template
 from modules.database.scripts.main import MySQLYouTubeDB
@@ -128,7 +126,7 @@ def save_main_index_to_file(db_manager: MySQLYouTubeDB):
 
         info_cards_list.append(f"""<div class="card">
         <img src="{data["thumbnail"]}" alt="{data["title"]}">
-        <h3><a href="{get_url(data["title"])}">{data["title"]}</a></h3>
+        <h3><a href="{data["title"]}">{data["title"]}</a></h3>
         <p>구독자 수: {subscriber_count}</p>
         <p>전체 조회 수: {view_count}</p>
         <p>등록된 영상 수: {video_count}</p>

@@ -33,22 +33,38 @@ class VideoDataManager(BaseDatabaseManager):
     def fetch_all_cat_videoData(self):
         return self.fetch_all_videoData("지식줄고양")
     
-    def upsert_videoData(self, table_name, video_data_list):
+    def upsert_videoData(self, table_name, video_data):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_VIDEO`"
 
-        data_list = [
-            (
-                video["video_id"],
-                video["title"],
-                video["view_count"],
-                video["like_count"],
-                video["comment_count"],
-                video["publish_time"],
-                video["is_shorts"],
-            )
-            for video in video_data_list
-        ]
+        if isinstance(video_data, list):
+            data_list = [
+                (
+                    video["video_id"],
+                    video["title"],
+                    video["view_count"],
+                    video["like_count"],
+                    video["comment_count"],
+                    video["publish_time"],
+                    video["is_shorts"],
+                )
+                for video in video_data
+            ]
+        elif isinstance(video_data, dict):
+            data_list = [
+                (
+                    video_data["video_id"],
+                    video_data["title"],
+                    video_data["view_count"],
+                    video_data["like_count"],
+                    video_data["comment_count"],
+                    video_data["publish_time"],
+                    video_data["is_shorts"],
+                )
+            ]
+        else:
+            data_list = []  # video_data가 알 수 없는 타입일 경우 빈 리스트 반환
+            
         print(f"[INFO] Inserting or updating video data in {table_name}")
         
         sql = f"""

@@ -1,12 +1,12 @@
 from config.api_config import get_api_key
 from googleapiclient.discovery import build
-from config.channelid_config import CHANNELID
+from config.channelId import CHANNELID
 from modules.database import MySQLYouTubeDB
 from modules.links import collect_creators
-from modules.Youtube import YouTubeManager
-from modules.Youtube import fetch_shorts_videos
-from modules.Youtube import fetch_all_playlists
-from modules.Youtube import fetch_all_playlist_items
+from modules.youtube import YouTubeManager
+from modules.youtube import fetch_shorts_videos
+from modules.youtube import fetch_all_playlists
+from modules.youtube import fetch_all_playlist_items
 
 def collect_creators(db_manager, channel_name, api_key_num):
     youtube_manager = YouTubeManager(
@@ -34,7 +34,7 @@ if __name__=="__main__":
     #collect_creators(db_manager, "김 럽미", 8)
     #collect_creators(db_manager, "청산유수현 SUHYEON", 8)
     #collect_creators(db_manager, "지식줄고양", 8)
-    #collect_creators(db_manager, "우정잉", 8)
+    collect_creators(db_manager, "우정잉", 8)
 
     #collect_creators_channelInfo(db_manager, "보겸TV", 8)
     #collect_creators_channelInfo(db_manager, "김 럽미", 8)
@@ -59,9 +59,13 @@ if __name__=="__main__":
     #playlist_ids = fetch_all_playlists(youtube, CHANNELID["김럽미"])
     #all_video_data_1 = fetch_all_playlist_items(youtube, playlist_ids)
     #all_video_data3 = fetch_shorts_videos(youtube, CHANNELID["김럽미"])
+
+    #playlist_ids = fetch_all_playlists(youtube, CHANNELID["우정잉"])
+    #all_video_data_1 = fetch_all_playlist_items(youtube, playlist_ids)
+    #all_video_data3 = fetch_shorts_videos(youtube, CHANNELID["우정잉"])
     
     #db_manager.upsert_videoIds(table_name="우정잉", video_ids_list=all_video_data1)
-    #db_manager.upsert_videoIds(table_name="우정잉", video_ids_list=all_video_data_1)
+    #db_manager.upsert_videoIds(table_name="우정잉", video_ids_list=all_video_data3)
     #db_manager.upsert_videoIds(table_name="보겸TV", video_ids_list=all_video_data1)
     #db_manager.upsert_videoIds(table_name="우정잉", video_ids_list=all_video_data1)
     #db_manager.upsert_videoIds(table_name="지식줄고양", video_ids_list=all_video_data2)

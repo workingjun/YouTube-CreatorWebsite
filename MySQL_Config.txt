@@ -6,7 +6,6 @@ mysql -u everytime -p --port=666
 CREATE USER 'youtube'@'%' IDENTIFIED BY '2483';
 
 GRANT ALL PRIVILEGES ON *.* TO 'youtube'@'%' WITH GRANT OPTION;
-WITH GRANT OPTION은 root 계정이 다른 사용자에게도 권한을 부여할 수 있도록 허용합니다.
 
 GRANT ALL PRIVILEGES ON *.* TO 'youtube'@'%';
 
@@ -52,6 +51,15 @@ CREATE TABLE youtube_channels (
     video_count INT,
     views_count BIGINT
 );
+
+CREATE TABLE `지식줄고양_Links` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    image_link TEXT,
+    external_link TEXT
+);
+
+ALTER TABLE `지식줄고양_Links` ADD CONSTRAINT unique_name UNIQUE (name);
 
 ALTER TABLE `지식줄고양_VIDEO`
 ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255));

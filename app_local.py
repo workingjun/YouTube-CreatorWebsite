@@ -32,7 +32,7 @@ def initialize_db_manager():
     global db_manager
     try:
         db_manager = MySQLYouTubeDB()
-        db_manager.connect()
+        db_manager.connect(ssh_flags=True)
         app.logger.info("Database connection initialized.")
     except Exception as e:
         app.logger.error(f"Failed to initialize database: {e}")
@@ -123,5 +123,7 @@ def create_app():
     initialize_db_manager()  # 애플리케이션 시작 시 데이터베이스 초기화
     return app
 
-# WSGI 인터페이스를 위한 앱 객체
-application = create_app()
+if __name__=="__main__":
+    # WSGI 인터페이스를 위한 앱 객체
+    application = create_app()
+    application.run()

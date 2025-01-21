@@ -1,4 +1,4 @@
-from modules.Youtube.scripts.api_manager import YoutubeApiManager
+from modules.youtube.scripts.api_manager import YoutubeApiManager
 from modules.database.scripts.main import MySQLYouTubeDB
 
 class YouTubeManager:
@@ -16,7 +16,7 @@ class YouTubeManager:
             video_ids = [row['video_id'] for row in video_ids_list]
         else:
             video_ids = [row['video_id'] for row in db_manager.fetch_videoIds(table_name=table_name)] 
-        
+            
         results = self.api_manager.get_channel_information()
         db_manager.upsert_channel_info(data=results)
 
@@ -25,12 +25,13 @@ class YouTubeManager:
             stats = self.api_manager.get_video_statistics(video_id)
             if stats is None:
                 continue
-            video_data.append(stats)
-        
-        batch_size = 100  # 한 번에 처리할 데이터 크기
-        for i in range(0, len(video_data), batch_size):
-            batch = video_data[i:i+batch_size]
-            db_manager.upsert_videoData(table_name=table_name, video_data_list=batch)
+            #video_data.append(stats)
+            db_manager.upsert_videoData(table_name, stats)
+
+        #batch_size = 100  # 한 번에 처리할 데이터 크기
+        #for i in range(0, len(video_data), batch_size):
+        #    batch = video_data[i:i+batch_size]
+        #    db_manager.upsert_videoData(table_name=table_name, video_data=batch)
 
     def collect_channelInfo(self, db_manager: MySQLYouTubeDB):
         results = self.api_manager.get_channel_information()
