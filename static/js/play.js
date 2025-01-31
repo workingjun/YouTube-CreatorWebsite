@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const videoCards = document.querySelectorAll('.video-card');
+    const videoCards = document.querySelectorAll('.video-card, .video-card-info');
 
     videoCards.forEach(card => {
         const thumbnail = card.querySelector('.thumbnail');
