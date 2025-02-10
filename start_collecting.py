@@ -2,7 +2,7 @@ from config.api_config import get_api_key
 from googleapiclient.discovery import build
 from config.channelId import CHANNELID
 from modules.database import MySQLYouTubeDB
-from modules.links import collect_creators
+from modules import collect_creators
 from modules.youtube import YouTubeManager
 from modules.youtube import fetch_shorts_videos
 from modules.youtube import fetch_all_playlists

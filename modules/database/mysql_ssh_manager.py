@@ -1,8 +1,8 @@
 import pymysql, time
 from config.db_config import DB_CONFIG_SSH
 from config.db_config import DB_CONFIG_DEFAULT
-from modules.database.scripts.ssh_tunnel import start_ssh_tunnel
-from modules.database.scripts.ssh_tunnel import stop_ssh_tunnel
+from modules.database.ssh_tunnel import start_ssh_tunnel
+from modules.database.ssh_tunnel import stop_ssh_tunnel
 
 class BaseDatabaseManager:
     def __init__(self):

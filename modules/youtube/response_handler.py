@@ -1,6 +1,6 @@
 import re
-from modules.utiles.scripts.transform import transform_datetime
-from modules.utiles.scripts.shorts import is_short_video
+from modules.transform import transform_datetime
+from modules.shorts import is_short_video
 
 class YouTubeResponseHandler:
     @staticmethod
