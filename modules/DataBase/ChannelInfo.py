@@ -1,4 +1,4 @@
-from modules.database.scripts.mysql_ssh_manager import BaseDatabaseManager
+from modules.database.mysql_ssh_manager import BaseDatabaseManager
 
 class ChannelInfoManager(BaseDatabaseManager):
     def upsert_channel_info(self, data):

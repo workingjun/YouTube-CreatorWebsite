@@ -1,8 +1,8 @@
 import math
 from datetime import datetime
-from modules.utiles.scripts.template import load_main
-from modules.utiles.scripts.template import load_template
-from modules.database.scripts.main import MySQLYouTubeDB
+from modules.template import load_main
+from modules.template import load_template
+from modules.database.main import MySQLYouTubeDB
 
 def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTubeDB):
     last_video_cards = make_video_card(table_name, db_manager, info_flag=True)

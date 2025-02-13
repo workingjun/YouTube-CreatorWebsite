@@ -1,4 +1,4 @@
-from modules.database.scripts.mysql_ssh_manager import BaseDatabaseManager
+from modules.database.mysql_ssh_manager import BaseDatabaseManager
 
 class VideoDataManager(BaseDatabaseManager):
     """비디오 데이터를 관리하는 클래스"""

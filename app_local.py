@@ -67,7 +67,6 @@ def initialize_youtube_creators():
         app.logger.error(f"Error initializing YouTube creators: {e}")
         raise
 
-    
 # 요청 전 작업
 @app.before_request
 def before_request():
@@ -126,4 +125,4 @@ def create_app():
 if __name__=="__main__":
     # WSGI 인터페이스를 위한 앱 객체
     application = create_app()
-    application.run()
+    application.run(debug=True)

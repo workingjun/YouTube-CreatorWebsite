@@ -1,1 +1,1 @@
-from .scripts.main import MySQLYouTubeDB
+from .main import MySQLYouTubeDB

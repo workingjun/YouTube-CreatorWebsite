@@ -1,5 +1,5 @@
-from modules.youtube.scripts.api_manager import YoutubeApiManager
-from modules.database.scripts.main import MySQLYouTubeDB
+from modules.youtube.api_manager import YoutubeApiManager
+from modules.database.main import MySQLYouTubeDB
 
 class YouTubeManager:
     def __init__(self, api_key, channelID=None, channel_name=None):

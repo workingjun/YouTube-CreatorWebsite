@@ -1,7 +1,6 @@
-import json, time
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from modules.links.scripts.chrome import ChromeDriverManager
 from config.channelId import CHANNELID
 
 def collect_creators(browser: webdriver.Chrome, channel_name):

@@ -6,30 +6,18 @@ mysql -u everytime -p --port=666
 CREATE USER 'youtube'@'%' IDENTIFIED BY '2483';
 
 GRANT ALL PRIVILEGES ON *.* TO 'youtube'@'%' WITH GRANT OPTION;
-
 GRANT ALL PRIVILEGES ON *.* TO 'youtube'@'%';
 
 CREATE DATABASE youtubeDATA;
-
 GRANT ALL PRIVILEGES ON youtubeDATA.* TO 'youtube'@'%';
-
 USE YoutubeDATA1;
 
-우정잉
-청산유수현 SUHYEON
-보겸TV
-김 럽미
-지식줄고양
-
-CREATE TABLE `지식줄고양_IDS` (
+CREATE TABLE `YoutuberName_IDS` (
     video_id VARCHAR(255) NOT NULL, 
     publish_time DATETIME NOT NULL
 );
 
-ALTER TABLE `지식줄고양_IDS`
-ADD CONSTRAINT unique_video_id UNIQUE (video_id);
-
-CREATE TABLE `지식줄고양_VIDEO` (
+CREATE TABLE `YoutuberName_VIDEO` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     video_id VARCHAR(255) NOT NULL,
     title TEXT NOT NULL,
@@ -39,6 +27,13 @@ CREATE TABLE `지식줄고양_VIDEO` (
     publish_time DATETIME NOT NULL,
     is_shorts BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `YoutuberName_Links` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    image_link TEXT,
+    external_link TEXT
 );
 
 CREATE TABLE youtube_channels (
@@ -52,19 +47,11 @@ CREATE TABLE youtube_channels (
     views_count BIGINT
 );
 
-CREATE TABLE `지식줄고양_Links` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    image_link TEXT,
-    external_link TEXT
-);
-
-ALTER TABLE `지식줄고양_Links` ADD CONSTRAINT unique_name UNIQUE (name);
-
-ALTER TABLE `지식줄고양_VIDEO`
-ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255));
-
+ALTER TABLE `YoutuberName_IDS` ADD CONSTRAINT unique_video_id UNIQUE (video_id);
+ALTER TABLE `YoutuberName_Links` ADD CONSTRAINT unique_name UNIQUE (name);
+ALTER TABLE `YoutuberName_VIDEO` ADD CONSTRAINT unique_video_id UNIQUE (video_id, title(255));
 FLUSH PRIVILEGES;
+
 
 TRUNCATE TABLE comments;
 

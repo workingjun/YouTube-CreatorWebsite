@@ -1,6 +1,6 @@
 from config.channelId import CHANNELID
-from modules.youtube.scripts.youtube_manager import YouTubeManager
-from modules.youtube.scripts.html_genertator import save_channel_index_to_file
+from modules.youtube.youtube_manager import YouTubeManager
+from modules.youtube.html_genertator import save_channel_index_to_file
 
 # YouTube Creator Website class
 class YOUTUBECreatorWebsite:
