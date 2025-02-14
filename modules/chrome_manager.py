@@ -1,5 +1,5 @@
 import os, socket, shlex
-from typing import Optional, TypeVar, Generic, List, Tuple, Union
+from typing import Optional
 from subprocess import Popen
 import chromedriver_autoinstaller
 from selenium_stealth import stealth
