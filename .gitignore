@@ -1,5 +1,3 @@
 /**/__pycache__
-config/api_config.py
-config/db_config.py
-template/index.html
-chrometemp/
+src/config/api_config.py
+src/config/db_config.py
