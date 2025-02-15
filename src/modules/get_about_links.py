@@ -2,6 +2,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from src.config.channelId import CHANNELID
+from src.config.channelId import CHANNELID
 
 def collect_creators(browser: webdriver.Chrome, channel_name):
     time.sleep(5)
