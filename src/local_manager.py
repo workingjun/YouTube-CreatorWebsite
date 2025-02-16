@@ -1,4 +1,4 @@
-import logging, os
+import os
 from flask import Flask, render_template, jsonify, g
 from src.config import get_api_key
 from src.config import CHANNELID
@@ -7,6 +7,7 @@ from src.app.routes import links_bp
 from src.app.database import MySQLYouTubeDB
 from src.app.youtube import YOUTUBECreatorWebsite
 from src.app.youtube import save_main_index_to_file
+from src.utils.custom_logging import GetLogger
 
 # Flask 애플리케이션 생성
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -18,13 +19,7 @@ app.register_blueprint(links_bp)
 
 # 전역 변수로 DB 매니저 초기화
 db_manager = None
-
-# 로깅 설정
-logging.basicConfig(
-    filename='app.log',
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logger = None
 
 # 데이터베이스 초기화
 def initialize_db_manager():
@@ -33,9 +28,9 @@ def initialize_db_manager():
     try:
         db_manager = MySQLYouTubeDB()
         db_manager.connect(ssh_flags=True)
-        app.logger.info("Database connection initialized.")
+        logger.info("Database connection initialized.")
     except Exception as e:
-        app.logger.error(f"Failed to initialize database: {e}")
+        logger.error(f"Failed to initialize database: {e}")
         raise RuntimeError("Database initialization failed.")
 
 def initialize_youtube_creators():
@@ -62,9 +57,9 @@ def initialize_youtube_creators():
                 }
                 print(f"Creator for {channel_name} initialized successfully.")
 
-            app.logger.info("YouTube creators initialized successfully.")
+            logger.info("YouTube creators initialized successfully.")
     except Exception as e:
-        app.logger.error(f"Error initializing YouTube creators: {e}")
+        logger.error(f"Error initializing YouTube creators: {e}")
         raise
 
 # 요청 전 작업
@@ -83,7 +78,7 @@ def teardown(exception):
     """요청 후 DB 연결 닫기"""
     if hasattr(g, 'db_manager') and g.db_manager:
         g.db_manager.close()
-        app.logger.info("Database connection closed.")
+        logger.info("Database connection closed.")
 
 # 채널 데이터 렌더링
 @app.route('/<channel_name>')
@@ -106,7 +101,7 @@ def render_channel(channel_name):
         )
         return render_template(creator_data["html"])
     except Exception as e:
-        app.logger.error(f"Error rendering channel {channel_name}: {e}")
+        logger.error(f"Error rendering channel {channel_name}: {e}")
         return jsonify({"error": str(e)}), 500
 
 # 애플리케이션 메인 페이지
@@ -119,6 +114,8 @@ def index():
 # WSGI 서버 초기화
 def create_app():
     """PythonAnywhere WSGI 서버를 위한 앱 생성"""
+    global logger
+    logger = GetLogger()
     initialize_db_manager()  # 애플리케이션 시작 시 데이터베이스 초기화
     return app
 
