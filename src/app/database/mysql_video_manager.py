@@ -2,36 +2,6 @@ from src.app.database.mysql_manager import BaseDatabaseManager
 
 class VideoDataManager(BaseDatabaseManager):
     """비디오 데이터를 관리하는 클래스"""
-
-    def upsert_friendshiping_videoData(self, video_data_list):
-        self.upsert_videoData("우정잉", video_data_list)
-    
-    def upsert_suhyeon_videoData(self, video_data_list):
-        self.upsert_videoData("청산유수현 SUHYEON", video_data_list)
-
-    def upsert_bokyem_videoData(self, video_data_list):
-        self.upsert_videoData("보겸TV", video_data_list)
-
-    def upsert_loveme_videoData(self, video_data_list):
-        self.upsert_videoData("김 럽미", video_data_list)
-
-    def upsert_cat_videoData(self, video_data_list):
-        self.upsert_videoData("지식줄고양", video_data_list)
-    
-    def fetch_all_friendshiping_videoData(self):
-        return self.fetch_all_videoData("우정잉")
-    
-    def fetch_all_suhyeon_videoData(self):
-        return self.fetch_all_videoData("청산유수현 SUHYEON")
-    
-    def fetch_all_bokyem_videoData(self):
-        return self.fetch_all_videoData("보겸TV")
-    
-    def fetch_all_loveme_videoData(self):
-        return self.fetch_all_videoData("김 럽미")
-    
-    def fetch_all_cat_videoData(self):
-        return self.fetch_all_videoData("지식줄고양")
     
     def upsert_videoData(self, table_name, video_data):
         # 테이블 이름을 백틱으로 감싸기
@@ -92,36 +62,6 @@ class VideoDataManager(BaseDatabaseManager):
     
 class VideoIdManager(BaseDatabaseManager):
     """비디오 아이디를 관리하는 클래스"""
-    
-    def upsert_friendshiping_videoIds(self, video_data_list):
-        self.upsert_videoIds("우정잉", video_data_list)
-    
-    def upsert_suhyeon_videoIds(self, video_data_list):
-        self.upsert_videoIds("청산유수현 SUHYEON", video_data_list)
-
-    def upsert_bokyem_videoIds(self, video_data_list):
-        self.upsert_videoIds("보겸TV", video_data_list)
-
-    def upsert_loveme_videoIds(self, video_data_list):
-        self.upsert_videoIds("김 럽미", video_data_list)
-
-    def upsert_cat_videoIds(self, video_data_list):
-        self.upsert_videoIds("지식줄고양", video_data_list)
-    
-    def fetch_all_friendshiping_videoIds(self):
-        return self.fetch_videoIds("우정잉")
-    
-    def fetch_all_suhyeon_videoIds(self):
-        return self.fetch_videoIds("청산유수현 SUHYEON")
-    
-    def fetch_all_bokyem_videoIds(self):
-        return self.fetch_videoIds("보겸TV")
-    
-    def fetch_all_loveme_videoIds(self):
-        return self.fetch_videoIds("김 럽미")
-    
-    def fetch_all_cat_videoIds(self):
-        return self.fetch_videoIds("지식줄고양")
     
     def upsert_videoIds(self, table_name, video_ids_list):
         # 테이블 이름을 백틱으로 감싸기
