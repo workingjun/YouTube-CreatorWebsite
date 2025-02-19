@@ -115,7 +115,10 @@ def index():
 def create_app():
     """PythonAnywhere WSGI 서버를 위한 앱 생성"""
     global logger
-    logger = GetLogger()
+    logger = GetLogger(
+        "logger_app_local", "src/logs/app.log",
+        "%(asctime)s - %(levelname)s - %(funcName)s - %(message)s"
+        )
     initialize_db_manager()  # 애플리케이션 시작 시 데이터베이스 초기화
     return app
 

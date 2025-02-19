@@ -1,14 +1,14 @@
 import os, logging
 from datetime import datetime
+from collections import deque
 
 def read_logs(filename, encoding="utf-8", num_lines=None) -> str:
     try:
         with open(filename, 'r', encoding=encoding) as log_file:
             if num_lines is None:
-                return log_file.read()  # 전체 읽기
+                return log_file.read()
             else:
-                # 마지막 num_lines만 읽기
-                return ''.join(log_file.readlines()[-num_lines:])
+                return ''.join(deque(log_file, maxlen=num_lines))  # O(1) 메모리 최적화
     except FileNotFoundError:
         return f"Log file '{filename}' not found."
     except Exception as e:
@@ -34,34 +34,12 @@ class CustomFormatter(logging.Formatter):
         ct = self.converter(record.created)  # 기본 시간 변환기 사용 (localtime)
         return datetime.fromtimestamp(record.created).strftime(datefmt)
 
-class BaseFileHandler(logging.Handler):
+class BaseFileHandler(logging.FileHandler):
     def __init__(self, filename, mode='a', encoding='utf-8'):
-        if mode not in ('a', 'w', 'x'):
-            raise ValueError("Invalid mode: Choose 'a', 'w', or 'x'")
         directory = os.path.dirname(filename)
-        if directory:  # 디렉토리가 비어 있지 않은 경우
+        if directory:
             os.makedirs(directory, exist_ok=True)
-
-        super().__init__()
-        self.filename = filename
-        self.file = open(filename, mode=mode, encoding=encoding, newline='')
-
-    def close(self):
-        if not self.file.closed:
-            self.file.close()
-        super().close()
-
-class FileLoggingHandler(BaseFileHandler):
-    def __init__(self, filename, mode='a', encoding='utf-8'):
         super().__init__(filename, mode, encoding)
-
-    def emit(self, record):
-        try:
-            formatted_message = self.formatter.format(record)  # 포맷된 메시지
-            self.file.write(formatted_message + "\n")
-            self.file.flush()  # 파일에 즉시 기록
-        except Exception:
-            self.handleError(record)
 
 class CustomLogging(logging.Logger):
     def __init__(self, name):
@@ -69,35 +47,33 @@ class CustomLogging(logging.Logger):
         self.setLevel(logging.DEBUG)
 
     def addHandler(self, filename, fmt=None, mode='a', encoding='utf-8'):
+        if filename is None:
+            raise ValueError("filename cannot be None. A valid log file path is required.")
         for handler in self.handlers:
-            if isinstance(handler, FileLoggingHandler) and handler.filename == filename:
-                return  # 이미 동일한 핸들러가 추가된 경우 무시
-        handler = FileLoggingHandler(filename, mode, encoding)
+            if isinstance(handler, BaseFileHandler) and handler.baseFilename == os.path.abspath(filename):
+                return
+        handler = BaseFileHandler(filename, mode, encoding)
         handler.setFormatter(CustomFormatter(fmt))
         super().addHandler(handler)
 
 class GetLogger:
-    _instance = None  # 하나의 전역 로거 유지
+    _instances = {}  # 여러 개의 싱글톤 인스턴스를 저장할 딕셔너리
 
-    def __new__(cls, logger_name="app.log", logger_option="GlobalLogger"):
-        if cls._instance is None:
-            logger = CustomLogging(logger_option)  # 하나의 글로벌 로거 생성
+    def __new__(cls, logger_type, logger_name=None, fmt=None, logger_option="GlobalLogger") -> CustomLogging:
+        if logger_type not in cls._instances:
+            logger = CustomLogging(logger_option)  # logger_option을 로거 이름으로 사용
+            logger.addHandler(logger_name, fmt)
+            cls._instances[logger_type] = logger  # 특정 타입의 로거 저장
+        return cls._instances[logger_type]  # 동일한 타입의 로거 반환
 
-            if not any(isinstance(h, logging.FileHandler) for h in logger.handlers):
-                logger.addHandler(logger_name)
-
-            cls._instance = logger  # 인스턴스 저장
-
-        return cls._instance  # 동일한 로거 반환
-    
 if __name__=="__main__":
-    # 로거 설정
-    logger = CustomLogging("DualLogger")
-    logger.addHandler("everytime_autoLike.log")
+    logger = GetLogger(
+        "logger", "src/logs/test.log", 
+        "%(asctime)s - %(levelname)s - %(funcName)s - %(message)s"
+        )
 
-    # 로깅 테스트
-    logger.debug("This is a debug message")
-    logger.info("This is an info message")
-    logger.warning("This is a warning message")
-    logger.error("This is an error message")
-    logger.critical("This is a critical message")
+    logger.debug("This is a debug message.")
+    logger.info("This is an info message.")
+    logger.warning("This is a warning message.")
+    logger.error("This is an error message.")
+    logger.critical("This is a critical message.")
