@@ -2,6 +2,7 @@ import logging, os
 from flask import Flask, render_template, jsonify, g
 from src.config import get_api_key
 from src.config import CHANNELID
+from src.config import DB_CONFIG_DEFAULT
 from src.app.routes import comments_bp
 from src.app.routes import links_bp
 from src.app.database import MySQLYouTubeDB
@@ -26,8 +27,7 @@ def initialize_db_manager():
     """DB 매니저 초기화"""
     global db_manager
     try:
-        db_manager = MySQLYouTubeDB()
-        db_manager.connect()
+        db_manager = MySQLYouTubeDB(DB_CONFIG_DEFAULT)
         logger.info("Database connection initialized.")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
