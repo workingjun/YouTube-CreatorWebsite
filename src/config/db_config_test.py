@@ -1,4 +1,5 @@
 import pymysql
+import pymysql.cursors
 
 SSH_HOST = "test.ssh.pythonanywhere.com"
 SSH_USER = "testUser"

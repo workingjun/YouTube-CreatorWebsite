@@ -1,6 +1,7 @@
 import os, logging
 from datetime import datetime
 from collections import deque
+from typing import overload
 
 def read_logs(filename, encoding="utf-8", num_lines=None) -> str:
     try:
@@ -58,8 +59,8 @@ class CustomLogging(logging.Logger):
 
 class GetLogger:
     _instances = {}  # 여러 개의 싱글톤 인스턴스를 저장할 딕셔너리
-
-    def __new__(cls, logger_type, logger_name=None, fmt=None, logger_option="GlobalLogger") -> CustomLogging:
+    
+    def __new__(cls, logger_type, logger_name=None, fmt=None, logger_option="GlobalLogger") -> "CustomLogging":
         if logger_type not in cls._instances:
             logger = CustomLogging(logger_option)  # logger_option을 로거 이름으로 사용
             logger.addHandler(logger_name, fmt)
