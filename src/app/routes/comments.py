@@ -1,27 +1,10 @@
 from flask import jsonify, Blueprint, request
 from src.config.api_config import get_api_key
+from src.config.channelId import CHANNELID
 from src.app.youtube.ytb_creator_website import YOUTUBECreatorWebsite
 
 # Define a single Blueprint for comments
 comments_bp = Blueprint('comments', __name__, url_prefix='/<channel_name>')
-
-# 채널별 API 키 매핑 (예시)
-CHANNEL_API_KEYS = {
-    "friendshiping": 1,
-    "suhyeon": 2,
-    "bokyem": 3,
-    "loveme": 4,
-    "cat": 5,
-}
-
-# 채널 이름 매핑
-CHANNEL_NAMES = {
-    "friendshiping": "우정잉",
-    "suhyeon": "유수현",
-    "bokyem": "보겸",
-    "loveme": "김럽미",
-    "cat": "지식줄고양",
-}
 
 def get_comments(channel_name, video_id, api_key_index):
     """Fetch comments for a specific video."""
@@ -43,12 +26,13 @@ def get_comments(channel_name, video_id, api_key_index):
 def get_channel_comments(channel_name):
     """Fetch comments dynamically based on the channel name."""
     video_id = request.args.get('videoId')
-    if channel_name not in CHANNEL_API_KEYS or channel_name not in CHANNEL_NAMES:
+    if channel_name not in CHANNELID:
         return jsonify({'error': 'Invalid channel name'}), 404
 
     # Get the API key index and channel name
-    api_key_index = CHANNEL_API_KEYS[channel_name]
-    channel_full_name = CHANNEL_NAMES[channel_name]
-
+    channel_full_name = CHANNELID[channel_name]
+    keys_list = list(CHANNELID.keys())  
+    api_key_index = keys_list.index(channel_name)
+                        
     return get_comments(channel_full_name, video_id, api_key_index)
 
