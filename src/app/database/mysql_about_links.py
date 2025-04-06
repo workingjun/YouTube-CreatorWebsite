@@ -1,9 +1,11 @@
-from src.app.database.mysql_manager import BaseDatabaseManager
+from src.app.database.db_manager import MysqlSSHManager
 
-class LinksManager(BaseDatabaseManager):
+class LinksManager:
     """비디오 아이디를 관리하는 클래스"""
-    
-    def upsert_Links(self, table_name, links_list):
+    def __init__(self, db_main: MysqlSSHManager):
+        self.db_manager = db_main
+
+    def execute_query_many(self, table_name, links_list):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_Links`"
         print(f"[INFO] Inserting or updating links in {table_name}:")
@@ -23,16 +25,16 @@ class LinksManager(BaseDatabaseManager):
             image_link = VALUES(image_link),
             external_link = VALUES(external_link)
         """
-        self.execute_query_many(sql, data_list)
+        self.db_manager.execute_query_many(sql, data_list)
         print(f"[SUCCESS] Links processed in {table_name}")
 
-    def fetch_Links(self, table_name):
+    def fetch_all(self, table_name):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_Links`"
 
         print(f"[INFO] Fetching all links from {table_name}")
         sql = f"SELECT * FROM {table_name_safe} ORDER BY id ASC"
-        result = self.fetch_all(sql)
+        result = self.db_manager.fetch_all(sql)
         print(f"[SUCCESS] Fetched all links from {table_name}")
 
         return result

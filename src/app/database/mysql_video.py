@@ -1,9 +1,11 @@
-from src.app.database.mysql_manager import BaseDatabaseManager
+from src.app.database.db_manager import MysqlSSHManager
 
-class VideoDataManager(BaseDatabaseManager):
+class VideoDataManager:
     """비디오 데이터를 관리하는 클래스"""
-    
-    def upsert_videoData(self, table_name, video_data):
+    def __init__(self, db_main: MysqlSSHManager):
+        self.db_manager = db_main
+
+    def execute_query_many(self, table_name, video_data):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_VIDEO`"
 
@@ -48,22 +50,24 @@ class VideoDataManager(BaseDatabaseManager):
             publish_time = VALUES(publish_time),
             is_shorts = VALUES(is_shorts)
         """
-        self.execute_query_many(sql, data_list)
+        self.db_manager.execute_query_many(sql, data_list)
         print(f"[SUCCESS] Video data processed in {table_name}")
     
-    def fetch_all_videoData(self, table_name):
+    def fetch_all(self, table_name):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_VIDEO`"
         print(f"[INFO] Fetching all video data from {table_name}")
         sql = f"SELECT * FROM {table_name_safe} ORDER BY publish_time DESC"
-        result = self.fetch_all(sql)
+        result = self.db_manager.fetch_all(sql)
         print(f"[SUCCESS] Fetched all video data from {table_name}")
         return result
     
-class VideoIdManager(BaseDatabaseManager):
+class VideoIdManager:
     """비디오 아이디를 관리하는 클래스"""
+    def __init__(self, db_main: MysqlSSHManager):
+        self.db_manager = db_main
     
-    def upsert_videoIds(self, table_name, video_ids_list):
+    def execute_query_many(self, table_name, video_ids_list):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_IDS`"
         print(f"[INFO] Inserting or updating video IDs in {table_name}:")
@@ -81,15 +85,15 @@ class VideoIdManager(BaseDatabaseManager):
             video_id = VALUES(video_id),
             publish_time = VALUES(publish_time)
         """
-        self.execute_query_many(sql, data_list)
+        self.db_manager.execute_query_many(sql, data_list)
         print(f"[SUCCESS] Video IDs processed in {table_name}")
 
-    def fetch_videoIds(self, table_name):
+    def fetch_all(self, table_name):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_IDS`"
 
         print(f"[INFO] Fetching all video IDs from {table_name}")
         sql = f"SELECT * FROM {table_name_safe} ORDER BY publish_time DESC"
-        result = self.fetch_all(sql)
+        result = self.db_manager.fetch_all(sql)
         print(f"[SUCCESS] Fetched all video IDs from {table_name}")
         return result

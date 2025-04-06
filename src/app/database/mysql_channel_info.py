@@ -1,7 +1,10 @@
-from src.app.database.mysql_manager import BaseDatabaseManager
+from src.app.database.db_manager import MysqlSSHManager
 
-class ChannelInfoManager(BaseDatabaseManager):
-    def upsert_channel_info(self, data):
+class ChannelInfoManager:
+    def __init__(self, db_main: MysqlSSHManager):
+        self.db_manager = db_main
+
+    def execute_query(self, data):
         print("[INFO] Inserting or updating channelInfo in youtube_channels:")
         
         params = (
@@ -26,23 +29,23 @@ class ChannelInfoManager(BaseDatabaseManager):
             video_count = VALUES(video_count),
             views_count = VALUES(views_count)
         """
-        self.execute_query(sql, params)
+        self.db_manager.execute_query(sql, params)
         print("[SUCCESS] channelInfo processed in youtube_channels")
     
-    def fetch_channel_info(self, title):
+    def fetch_one(self, title):
         
         print(f"[INFO] Fetching channelInfo for title: {title}")
         sql = "SELECT * FROM youtube_channels WHERE title = %s"
 
-        result = self.fetch_one(sql, (title,))
+        result = self.db_manager.fetch_one(sql, (title,))
         print(f"[SUCCESS] Fetched channelInfo for title: {title}")
         return result
         
-    def fetch_all_channel_info(self):
+    def fetch_all(self):
         
         print("[INFO] Fetching all channelInfo")
         sql = "SELECT * FROM youtube_channels"
 
-        result = self.fetch_all(sql)
+        result = self.db_manager.fetch_all(sql)
         print("[SUCCESS] Fetched all channelInfo")
         return result

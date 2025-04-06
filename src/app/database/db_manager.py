@@ -2,7 +2,8 @@ import pymysql, time
 from src.app.database.ssh_tunnel import start_ssh_tunnel, stop_ssh_tunnel
 from src.utils.custom_logging import GetLogger, CustomLogging
 
-class BaseDatabaseManager:
+class MysqlSSHManager:
+
     _instance = None
     _tunnel = None
     _conn = None
@@ -120,4 +121,3 @@ class BaseDatabaseManager:
         except pymysql.MySQLError as e:
             self.logger.error("Connection lost. Reconnecting... Error: %s", str(e))
             self.connect()
-

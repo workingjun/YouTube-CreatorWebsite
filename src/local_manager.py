@@ -5,7 +5,7 @@ from src.config import CHANNELID
 from src.config import DB_CONFIG_SSH
 from src.app.routes import comments_bp
 from src.app.routes import links_bp
-from src.app.database import MySQLYouTubeDB
+from src.app.database import MySQLYouTubeDBFactory
 from src.app.youtube import YOUTUBECreatorWebsite
 from src.app.youtube import save_main_index_to_file
 from src.utils.custom_logging import GetLogger
@@ -27,7 +27,7 @@ def initialize_db_manager():
     """DB 매니저 초기화"""
     global db_manager
     try:
-        db_manager = MySQLYouTubeDB(DB_CONFIG_SSH, True)
+        db_manager = MySQLYouTubeDBFactory(DB_CONFIG_SSH, True)
         logger.info("Database connection initialized.")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
