@@ -1,10 +1,11 @@
 from src.app.database.db_manager import MysqlSSHManager
+from src.app.database.interface.channel_info import IChannelInfoManager
 
-class ChannelInfoManager:
+class ChannelInfoManager(IChannelInfoManager):
     def __init__(self, db_main: MysqlSSHManager):
         self.db_manager = db_main
 
-    def execute_query(self, data):
+    def upsert_data(self, data):
         print("[INFO] Inserting or updating channelInfo in youtube_channels:")
         
         params = (

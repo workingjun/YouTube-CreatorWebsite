@@ -28,6 +28,7 @@ def initialize_db_manager():
     global db_manager
     try:
         db_manager = MySQLYouTubeDBFactory(DB_CONFIG_SSH, True)
+        db_manager.create()
         logger.info("Database connection initialized.")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")

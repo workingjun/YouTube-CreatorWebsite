@@ -1,11 +1,12 @@
 from src.app.database.db_manager import MysqlSSHManager
+from src.app.database.interface.links import ILinksManager
 
-class LinksManager:
+class LinksManager(ILinksManager):
     """비디오 아이디를 관리하는 클래스"""
     def __init__(self, db_main: MysqlSSHManager):
         self.db_manager = db_main
 
-    def execute_query_many(self, table_name, links_list):
+    def upsert_data(self, table_name, links_list):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_Links`"
         print(f"[INFO] Inserting or updating links in {table_name}:")

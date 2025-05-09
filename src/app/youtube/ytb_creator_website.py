@@ -13,6 +13,8 @@ class YOUTUBECreatorWebsite:
     def update_index_html(self, index_path, db_manager, update_video_ids:bool):
         """Updates the index.html with the latest channel data"""
         # Collect partial video data
-        self.youtube_manager.collect_data(db_manager=db_manager, table_name=self.channelName, update_video_ids=update_video_ids)
+        self.youtube_manager.collect_videoData(db_manager, self.channelName)
+        self.youtube_manager.collect_videoId(db_manager, self.channelName, update_video_ids)
+        self.youtube_manager.collect_channelInfo(db_manager)
         # Generate and save updated HTML file
-        save_channel_index_to_file(output_path=index_path, table_name=self.channelName, db_manager=db_manager)
+        save_channel_index_to_file(index_path, self.channelName, db_manager)
