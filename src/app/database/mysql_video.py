@@ -6,11 +6,11 @@ class VideoDataManager(IVideoDataManager):
     def __init__(self, db_main: MysqlSSHManager):
         self.db_manager = db_main
 
-    def upsert_data(self, table_name, video_data):
+    def upsert_data(self, table_name, data):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_VIDEO`"
 
-        if isinstance(video_data, list):
+        if isinstance(data, list):
             data_list = [
                 (
                     video["video_id"],
@@ -21,18 +21,18 @@ class VideoDataManager(IVideoDataManager):
                     video["publish_time"],
                     video["is_shorts"],
                 )
-                for video in video_data
+                for video in data
             ]
-        elif isinstance(video_data, dict):
+        elif isinstance(data, dict):
             data_list = [
                 (
-                    video_data["video_id"],
-                    video_data["title"],
-                    video_data["view_count"],
-                    video_data["like_count"],
-                    video_data["comment_count"],
-                    video_data["publish_time"],
-                    video_data["is_shorts"],
+                    data["video_id"],
+                    data["title"],
+                    data["view_count"],
+                    data["like_count"],
+                    data["comment_count"],
+                    data["publish_time"],
+                    data["is_shorts"],
                 )
             ]
         else:
@@ -68,7 +68,7 @@ class VideoIdManager(IVideoIdManager):
     def __init__(self, db_main: MysqlSSHManager):
         self.db_manager = db_main
     
-    def upsert_data(self, table_name, video_ids_list):
+    def upsert_data(self, table_name, data):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_IDS`"
         print(f"[INFO] Inserting or updating video IDs in {table_name}:")
@@ -77,7 +77,7 @@ class VideoIdManager(IVideoIdManager):
                 video_id["video_id"],
                 video_id["publish_time"]
             )
-            for video_id in video_ids_list
+            for video_id in data
         ]
         sql = f"""
         INSERT INTO {table_name_safe} (video_id, publish_time)

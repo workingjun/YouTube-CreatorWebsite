@@ -1,12 +1,9 @@
-from googleapiclient.discovery import build
-from src.config.api_config import get_api_key
-from src.config.channelId import CHANNELID
 from src.app.youtube.youtube_manager import YouTubeManager
 
-def collect_creators(db_manager, channel_name, api_key_num):
+def collect_creators(db_manager, channel_name, channel_id, api_key):
     youtube_manager = YouTubeManager(
-        channelID=CHANNELID[channel_name],
-        api_key=get_api_key(api_key_num)
+        channelID=channel_id[channel_name],
+        api_key=api_key
         )
     youtube_manager.collect_data(
         update_video_ids=False, 
@@ -14,9 +11,9 @@ def collect_creators(db_manager, channel_name, api_key_num):
         table_name=channel_name
         )
     
-def collect_creators_channelInfo(db_manager, channel_name, api_key_num):
+def collect_creators_channelInfo(db_manager, channel_name, channel_id, api_key):
     youtube_manager = YouTubeManager(
-        channelID=CHANNELID[channel_name],
-        api_key=get_api_key(api_key_num)
+        channelID=channel_id[channel_name],
+        api_key=api_key
         )
     youtube_manager.collect_channelInfo(db_manager)

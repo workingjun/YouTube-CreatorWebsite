@@ -1,6 +1,6 @@
 import pymysql, time
-from src.app.database.ssh_tunnel import start_ssh_tunnel, stop_ssh_tunnel
 from src.utils.custom_logging import GetLogger, CustomLogging
+from src.app.database.ssh_tunnel import start_ssh_tunnel, stop_ssh_tunnel
 
 class MysqlSSHManager:
 
@@ -16,6 +16,7 @@ class MysqlSSHManager:
             cls._instance = super().__new__(cls)
             cls._instance.ssh_flags = ssh_flags
             cls._instance.DB_CONFIG = DB_CONFIG
+            cls._instance.DB_CONFIG['cursorclass'] = pymysql.cursors.DictCursor
             cls._instance.logger = GetLogger("logger_db", "src/logs/db_manager.log",
                                              "%(asctime)s - %(levelname)s - %(funcName)s - %(message)s")
             cls._instance.connect()

@@ -5,11 +5,11 @@ class IVideoDataManager(ABC):
         pass
     
     @abstractmethod
-    def upsert_data(self):
+    def upsert_data(self, table_name, data):
         pass
 
     @abstractmethod
-    def fetch_all(self):
+    def fetch_all(self, table_name):
         pass
 
 
@@ -19,10 +19,10 @@ class IVideoIdManager(ABC):
         pass
     
     @abstractmethod
-    def upsert_data(self):
+    def upsert_data(self, table_name, data):
         pass
 
     @abstractmethod
-    def fetch_all(self):
+    def fetch_all(self, table_name):
         pass
 

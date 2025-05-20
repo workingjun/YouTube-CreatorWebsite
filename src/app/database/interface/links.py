@@ -5,12 +5,9 @@ class ILinksManager(ABC):
         pass
     
     @abstractmethod
-    def upsert_data(self):
+    def upsert_data(self, table_name, data):
         pass
 
     @abstractmethod
-    def fetch_all(self):
-        pass
-
-    def fetch_one(self):
+    def fetch_all(self, table_name):
         pass

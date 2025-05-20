@@ -1,7 +1,7 @@
 import math
 from datetime import datetime
-from src.utils.get_template import load_main
-from src.utils.get_template import load_template
+from src.utils.template import load_main
+from src.utils.template import load_template
 from src.app.database.app_mysql import MySQLYouTubeDB
 
 def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTubeDB):
@@ -18,19 +18,19 @@ def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTube
         file.write(html_output)
     
 def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
-    result_channelInfo = db_manager.chinfo.fetch_one(title=table_name)
-    result_Links = db_manager.links.fetch_all(table_name)
+    result_channelInfo = db_manager.chinfo.fetch_one(table_name)
+    # result_Links = db_manager.links.fetch_all(table_name)
     subscriber_count = format(result_channelInfo['subscriber_count'], ",")
     view_count = format(result_channelInfo['views_count'], ",")
     video_count = format(result_channelInfo['video_count'], ",")
 
-    Links_html = ""
-    for row in result_Links:
-        Links_html += f"""
-            <a class="link-item" href="{row["external_link"]}" target="_blank" rel="nofollow noopener noreferrer">
-                <img src="{row["image_link"]}" loading="lazy">
-                <span>"{row["name"]}"</span>
-            </a>"""
+    # Links_html = ""
+    # for row in result_Links:
+    #     Links_html += f"""
+    #         <a class="link-item" href="{row["external_link"]}" target="_blank" rel="nofollow noopener noreferrer">
+    #             <img src="{row["image_link"]}" loading="lazy">
+    #             <span>"{row["name"]}"</span>
+    #         </a>"""
         
     return f"""<!-- 채널 정보 섹션 -->
         <div class="channel-info" id="channel-info">
@@ -47,16 +47,17 @@ def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
             <p>채널 설명: {result_channelInfo["description"]}</p>
             <p>전체 조회 수: {view_count}</p>
             <p>동영상 수: {video_count}</p>
-            <div class="links-section">
-                <div class="links-list">
-                    {Links_html}
-                </div>
-            </div>
         </div>"""
+
+    # <div class="links-section">
+    #     <div class="links-list">
+    #         {Links_html}
+    #     </div>
+    # </div>
 
 def make_video_card(table_name, db_manager: MySQLYouTubeDB, info_flag=True):
     # Fetch video data
-    dic_videos = db_manager.videoDt.fetch_all(table_name=table_name)
+    dic_videos = db_manager.videoDt.fetch_all(table_name)
 
     # 조회수가 0 이상인 데이터만 필터링
     dic_videos = [row for row in dic_videos if row.get('view_count', 0) > 0]

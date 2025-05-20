@@ -10,7 +10,7 @@ class YouTubeResponseHandler:
             "channels.list": YouTubeResponseHandler._parse_channel_information,
             "videos.list": YouTubeResponseHandler._parse_video_statistics,
             "commentThreads.list": YouTubeResponseHandler._parse_comments,
-            "search.list": YouTubeResponseHandler._parse_channel_id_by_name,
+            "search.name": YouTubeResponseHandler._parse_channel_id_by_name,
             "search.Idlist": YouTubeResponseHandler._parse_video_Ids
         }
         parser = parsers.get(api_name)

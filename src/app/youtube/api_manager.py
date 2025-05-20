@@ -2,10 +2,10 @@ from googleapiclient.discovery import build
 from src.app.youtube.response_handler import YouTubeResponseHandler
 
 class YoutubeApiManager:
-    def __init__(self, api_key, channelID=None, channel_name=None):
+    def __init__(self, api_key, clannel_id=None, channel_name=None):
         self.youtube = build("youtube", "v3", developerKey=api_key)
         self.channel_name = channel_name
-        self.channelID = channelID or self.get_channel_id_by_name()
+        self.clannel_id = clannel_id or self.get_channel_id_by_name()
     
     def fetch_response(self, api_name, **params):
         """API 요청과 응답 처리"""
@@ -17,7 +17,7 @@ class YoutubeApiManager:
         return self.fetch_response(
             "channels.list",
             part="snippet,statistics",
-            id=self.channelID
+            id=self.clannel_id
         )
 
     def get_video_statistics(self, video_id):
@@ -45,14 +45,14 @@ class YoutubeApiManager:
         return self.fetch_response(
             "search.Idlist",
             part="snippet",
-            channelId=self.channelID,
+            clannel_id=self.clannel_id,
             maxResults=10,
             order="date",
         )
     
     def get_channel_id_by_name(self):
         return self.fetch_response(
-            "search.list",
+            "search.name",
             part='snippet',
             q=self.channel_name,  # 검색어 (채널 이름)
             type='channel',  # 채널만 검색

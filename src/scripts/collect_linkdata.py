@@ -1,11 +1,14 @@
-from src.app.database import MySQLYouTubeDB
+from src.app.database import MySQLYouTubeDBFactory
 from src.modules import collect_creators
 from src.modules import ChromeDriverManager
-from src.config import CHANNELID
+from src.utils.yamL import load_yaml
 
 def start_collect_link_data():
-    db_manager = MySQLYouTubeDB()
-    db_manager.connect(ssh_flags=True)
+    CHANNELID = load_yaml("./config/channel_id.dev.yaml")
+    DB_CONFIG = load_yaml("./config/db_config.dev.yaml")["ssh"]
+
+    db_manager = MySQLYouTubeDBFactory(DB_CONFIG, True)
+    db_manager.db_core.connect()
     manager = ChromeDriverManager()
     for channel_name, channel_id in CHANNELID.items():
         manager.start(
@@ -13,4 +16,4 @@ def start_collect_link_data():
             headless=True, maximize=True
             )
         dictonary = collect_creators(manager.browser, channel_name)
-        db_manager.upsert_Links(table_name=channel_name, links_list=dictonary)
+        db_manager.links.upsert_data(channel_name, dictonary)

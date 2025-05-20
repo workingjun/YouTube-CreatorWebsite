@@ -52,10 +52,22 @@
         .card a:hover {
             background: #0056b3;
         }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <h1 style="text-align: center; margin: 20px 0;">Channel Information</h1>
+
+    <div class="form-container">
+        <form method="GET" action="">
+            <input type="text" name="channel_name" placeholder="채널 이름을 입력하세요" required>
+            <button type="submit">검색</button>
+        </form>
+    </div>
+
     <div class="container">
         {container}
     </div>

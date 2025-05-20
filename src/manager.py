@@ -1,14 +1,14 @@
-import logging, os
-from flask import Flask, render_template, jsonify, g
-from src.config import get_api_key
-from src.config import CHANNELID
-from src.config import DB_CONFIG_DEFAULT
+import os
+from flask import Flask, render_template, request, jsonify, g
 from src.app.routes import comments_bp
-from src.app.routes import links_bp
 from src.app.database import MySQLYouTubeDBFactory
 from src.app.youtube import YOUTUBECreatorWebsite
 from src.app.youtube import save_main_index_to_file
 from src.utils.custom_logging import GetLogger
+from src.utils.yamL import load_yaml, append_yaml
+
+FILE_NAME_API = './config/api_config.dev.yaml'
+FILE_NAME_DB = './config/db_config.dev.yaml'
 
 # Flask 애플리케이션 생성
 app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -16,69 +16,38 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # Register Blueprint for comments
 app.register_blueprint(comments_bp)
-app.register_blueprint(links_bp)
 
 # 전역 변수로 DB 매니저 초기화
 db_manager = None
 logger = None
+g.youtube_creators = {}
 
-# 데이터베이스 초기화
+API_KEY = load_yaml(FILE_NAME_API)
+DB_CONFIG = load_yaml(FILE_NAME_DB)["default"]
+
 def initialize_db_manager():
-    """DB 매니저 초기화"""
-    global db_manager
-    try:
-        db_manager = MySQLYouTubeDBFactory(DB_CONFIG_DEFAULT)
-        logger.info("Database connection initialized.")
-    except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
-        raise RuntimeError("Database initialization failed.")
-
-def initialize_youtube_creators():
-    """YouTube 크리에이터 객체 초기화"""
-    try:
-        if not hasattr(g, 'youtube_creators'):
-            g.youtube_creators = {}
-
-            # CHANNELID 딕셔너리의 키와 값을 enumerate와 함께 사용
-            for index, (channel_name, channel_id) in enumerate(CHANNELID.items()):
-                print(f"Initializing creator for channel: {channel_name} (Index: {index})")
-
-                # API 키 가져오기
-                api_key = get_api_key(index+1)
-                print(f"API Key for {channel_name}: {api_key}")
-
-                # 크리에이터 객체 생성
-                g.youtube_creators[channel_name] = {
-                    "creator": YOUTUBECreatorWebsite(
-                        channelName=channel_name,
-                        api_key=api_key
-                    ),
-                    "html": f"{channel_name}.html"
-                }
-                print(f"Creator for {channel_name} initialized successfully.")
-
-            logger.info("YouTube creators initialized successfully.")
-    except Exception as e:
-        logger.error(f"Error initializing YouTube creators: {e}")
-        raise
-
-# 요청 전 작업
-@app.before_request
-def before_request():
     """요청 전에 DB 연결 및 크리에이터 초기화"""
     global db_manager
     if not db_manager:
-        initialize_db_manager()
-    g.db_manager = db_manager
-    initialize_youtube_creators()
+        g.db_manager = MySQLYouTubeDBFactory(DB_CONFIG)
+        g.db_manager.db_core.connect()
 
-# 요청 후 작업
-@app.teardown_appcontext
-def teardown(exception):
-    """요청 후 DB 연결 닫기"""
-    if hasattr(g, 'db_manager') and g.db_manager:
-        g.db_manager.close()
-        logger.info("Database connection closed.")
+def initialize_youtube_creators(api_key, channel_name):
+    """YouTube 크리에이터 객체 초기화"""
+    try:
+        # 크리에이터 객체 생성
+        g.youtube_creators[channel_name] = {
+            "creator": YOUTUBECreatorWebsite(
+                api_key=api_key,
+                channel_name=channel_name
+            ),
+            "html": f"{channel_name}.html"
+        }
+        print(f"Creator for {channel_name} initialized successfully.")
+        logger.info("YouTube creators initialized successfully.")
+    except Exception as e:
+        logger.error(f"Error initializing YouTube creators: {e}")
+        raise
 
 # 채널 데이터 렌더링
 @app.route('/<channel_name>')
@@ -105,9 +74,11 @@ def render_channel(channel_name):
         return jsonify({"error": str(e)}), 500
 
 # 애플리케이션 메인 페이지
-@app.route('/')
+@app.route('/', methods=["GET"])
 def index():
     """메인 페이지 렌더링"""
+    channel_name = request.args.get("channel_name")
+    initialize_youtube_creators(channel_name, API_KEY[1])
     save_main_index_to_file(db_manager)
     return render_template('main.html')
 

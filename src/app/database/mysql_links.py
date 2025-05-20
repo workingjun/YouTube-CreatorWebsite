@@ -6,7 +6,7 @@ class LinksManager(ILinksManager):
     def __init__(self, db_main: MysqlSSHManager):
         self.db_manager = db_main
 
-    def upsert_data(self, table_name, links_list):
+    def upsert_data(self, table_name, data):
         # 테이블 이름을 백틱으로 감싸기
         table_name_safe = f"`{table_name}_Links`"
         print(f"[INFO] Inserting or updating links in {table_name}:")
@@ -17,7 +17,7 @@ class LinksManager(ILinksManager):
                 link["image_link"],
                 link["external_link"]
             )
-            for link in links_list
+            for link in data
         ]
         sql = f"""
         INSERT INTO {table_name_safe} (name, image_link, external_link)

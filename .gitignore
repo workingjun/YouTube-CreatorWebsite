@@ -1,4 +1,2 @@
 /**/__pycache__
-src/config/api_config.py
-src/config/db_config.py
-src/config/channelId.py
+src/config/*.dev.yaml

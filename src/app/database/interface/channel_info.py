@@ -5,9 +5,13 @@ class IChannelInfoManager(ABC):
         pass
     
     @abstractmethod
-    def upsert_data(self):
+    def upsert_data(self, data):
         pass
 
     @abstractmethod
-    def fetch_one(self):
+    def fetch_one(self, title):
+        pass
+
+    @abstractmethod
+    def fetch_all(self):
         pass
