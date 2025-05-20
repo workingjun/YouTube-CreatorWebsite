@@ -1,8 +1,8 @@
 default:
-  host: ytbCreator.mysql.pythonanywhere-services.com
-  user: ytbCreator
-  password: 1111
-  database: YoutubeDATA1
+  host: test.mysql.pythonanywhere-services.com
+  user: testUser
+  password: testDBPassword
+  database: testDatabase
   connect_timeout: 10
   read_timeout: 10
   autocommit: false
@@ -10,9 +10,9 @@ default:
 
 ssh:
   host: 127.0.0.1
-  user: ytbCreator
-  password: 111
-  database: YoutubeDATA1
+  user: testUser
+  password: testDBPassword
+  database: testDatabase
   connect_timeout: 10
   read_timeout: 10
   autocommit: false
