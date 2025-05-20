@@ -5,3 +5,4 @@ chromedriver_autoinstaller
 google-api-python-client
 flask
 selenium_stealth
+pyyaml
