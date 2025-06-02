@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, request, jsonify, g
-from src.app.routes import comments_bp
+from src.app.routes import comments_bp, channel_bp
 from src.app.database import MySQLYouTubeDBFactory
 from src.app.youtube import YOUTUBECreatorWebsite
 from src.app.youtube import save_main_index_to_file
@@ -16,6 +16,7 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # Register Blueprint for comments
 app.register_blueprint(comments_bp)
+app.register_blueprint(channel_bp)
 
 # 전역 변수로 DB 매니저 초기화
 db_manager = None
@@ -48,30 +49,6 @@ def initialize_youtube_creators(api_key, channel_name):
     except Exception as e:
         logger.error(f"Error initializing YouTube creators: {e}")
         raise
-
-# 채널 데이터 렌더링
-@app.route('/<channel_name>')
-def render_channel(channel_name):
-    """동적 채널 페이지 렌더링"""
-    creators = getattr(g, 'youtube_creators', {})
-    if channel_name not in creators:
-        return jsonify({"error": "Channel not found"}), 404
-
-    creator_data = creators[channel_name]
-    try:
-        creator = creator_data["creator"]
-        output_path = os.path.join('templates', creator_data["html"])
-
-        # HTML 업데이트
-        creator.update_index_html(
-            index_path=output_path,
-            db_manager=g.db_manager,
-            update_video_ids=True
-        )
-        return render_template(creator_data["html"])
-    except Exception as e:
-        logger.error(f"Error rendering channel {channel_name}: {e}")
-        return jsonify({"error": str(e)}), 500
 
 # 애플리케이션 메인 페이지
 @app.route('/', methods=["GET"])
