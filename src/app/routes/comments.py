@@ -1,7 +1,14 @@
 from flask import jsonify, Blueprint, request
-from src.config.api_config import get_api_key
-from src.config.channelId import CHANNELID
+from src.utils.yamL import load_yaml, append_yaml
 from src.app.youtube.ytb_creator_website import YOUTUBECreatorWebsite
+
+FILE_NAME_API = './config/api_config.dev.yaml'
+FILE_NAME_DB = './config/db_config.dev.yaml'
+FILE_NAME_CH = './config/'
+
+API_KEY = load_yaml(FILE_NAME_API)
+load_yaml()
+DB_CONFIG = load_yaml(FILE_NAME_DB)["default"]
 
 # Define a single Blueprint for comments
 comments_bp = Blueprint('comments', __name__, url_prefix='/<channel_name>')
