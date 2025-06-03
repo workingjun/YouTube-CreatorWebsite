@@ -2,12 +2,18 @@ import math
 from datetime import datetime
 from src.utils.template import load_main
 from src.utils.template import load_template
-from src.app.database.app_mysql import MySQLYouTubeDB
+from src.app.repository.database import (
+    YoutubeChannel, YoutuberNameVIDEO, YoutuberNameLinks, YoutuberNameIDS, _session
+    )
+from src.utils.yamL import load_yaml
 
-def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTubeDB):
-    last_video_cards = make_video_card(table_name, db_manager, info_flag=True)
-    video_cards = make_video_card(table_name, db_manager, info_flag=False)
-    channel_info = make_channel_info(table_name, db_manager)
+FILE_NAME_CH = './config/channelid.dev.yaml'
+CHANNELID = load_yaml(FILE_NAME_CH)['CHANNELID']
+
+def save_channel_index_to_file(output_path, table_name):
+    channel_info = make_channel_info(table_name)
+    last_video_cards = make_video_card(table_name, info_flag=True)
+    video_cards = make_video_card(table_name, info_flag=False)
     template = load_template()
     html_output = template.format(
         channel_info=channel_info,
@@ -17,12 +23,12 @@ def save_channel_index_to_file(output_path, table_name, db_manager: MySQLYouTube
     with open(output_path, "w", encoding="utf-8") as file:
         file.write(html_output)
     
-def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
-    result_channelInfo = db_manager.chinfo.fetch_one(table_name)
-    # result_Links = db_manager.links.fetch_all(table_name)
-    subscriber_count = format(result_channelInfo['subscriber_count'], ",")
-    view_count = format(result_channelInfo['views_count'], ",")
-    video_count = format(result_channelInfo['video_count'], ",")
+def make_channel_info(table_name):
+    result_channelInfo = _session.query(YoutubeChannel).filter(YoutubeChannel.channel_id == CHANNELID[table_name]).first()
+    # result_Links = _session.query(YoutuberNameLinks).filter(YoutuberNameLinks.name == table_name).first()
+    subscriber_count = format(result_channelInfo.subscriber_count, ",")
+    view_count = format(result_channelInfo.views_count, ",")
+    video_count = format(result_channelInfo.video_count, ",")
 
     # Links_html = ""
     # for row in result_Links:
@@ -55,9 +61,9 @@ def make_channel_info(table_name, db_manager: MySQLYouTubeDB):
     #     </div>
     # </div>
 
-def make_video_card(table_name, db_manager: MySQLYouTubeDB, info_flag=True):
+def make_video_card(table_name, info_flag=True):
     # Fetch video data
-    dic_videos = db_manager.videoDt.fetch_all(table_name)
+    dic_videos = _session.query(YoutuberNameVIDEO).filter(YoutuberNameVIDEO.channel_id == CHANNELID[table_name]).all()
 
     # 조회수가 0 이상인 데이터만 필터링
     dic_videos = [row for row in dic_videos if row.get('view_count', 0) > 0]
@@ -112,12 +118,12 @@ def make_video_card(table_name, db_manager: MySQLYouTubeDB, info_flag=True):
     # Combine all video cards into a single HTML string
     return "".join(video_cards_list)
     
-def save_main_index_to_file(db_manager: MySQLYouTubeDB):
+def save_main_index_to_file():
     # 폴더 내 모든 JSON 파일 읽기
     data_list = []
     info_cards_list = []
 
-    data_list = db_manager.chinfo.fetch_all()
+    data_list = _session.query(YoutubeChannel).all()
 
     # 모든 JSON 데이터 출력
     for data in data_list:

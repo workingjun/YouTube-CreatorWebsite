@@ -3,12 +3,10 @@ from src.utils.yamL import load_yaml, append_yaml
 from src.app.youtube.ytb_creator_website import YOUTUBECreatorWebsite
 
 FILE_NAME_API = './config/api_config.dev.yaml'
-FILE_NAME_DB = './config/db_config.dev.yaml'
-FILE_NAME_CH = './config/'
+FILE_NAME_CH = './config/channelid.dev.yaml'
 
 API_KEY = load_yaml(FILE_NAME_API)
-load_yaml()
-DB_CONFIG = load_yaml(FILE_NAME_DB)["default"]
+CHANNELID = load_yaml(FILE_NAME_CH)['CHANNELID']
 
 # Define a single Blueprint for comments
 comments_bp = Blueprint('comments', __name__, url_prefix='/<channel_name>')
@@ -20,7 +18,7 @@ def get_comments(channel_name, video_id, api_key_index):
 
     try:
         youtube_creator = YOUTUBECreatorWebsite(
-            api_key=get_api_key(api_key_index),
+            api_key=API_KEY[1],
             channelName=channel_name
         )
         comments = youtube_creator.youtube_manager.api_manager.get_comments(video_id=video_id)

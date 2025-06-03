@@ -1,8 +1,8 @@
 import sshtunnel
-from src.config.db_config import MYSQL_HOST
-from src.config.db_config import SSH_USER
-from src.config.db_config import SSH_PASSWORD
-from src.config.db_config import SSH_HOST
+from src.utils.yamL import load_yaml
+
+FILE_NAME_DB = './config/db_config.dev.yaml'
+DB_CONFIG = load_yaml(FILE_NAME_DB)["default"]
 
 _tunnel = None
 
@@ -11,10 +11,10 @@ def start_ssh_tunnel():
 
     if _tunnel is None:
         _tunnel = sshtunnel.SSHTunnelForwarder(
-            (SSH_HOST, 22),
-            ssh_username=SSH_USER,
-            ssh_password=SSH_PASSWORD,
-            remote_bind_address=(MYSQL_HOST, 3306),
+            (DB_CONFIG['host'], 22),
+            ssh_username=DB_CONFIG['user'],
+            ssh_password=DB_CONFIG['password'],
+            remote_bind_address=(DB_CONFIG['localhost'], 3306),
             local_bind_address=('127.0.0.1', 0)  # 동적 포트
         )
         _tunnel.start()

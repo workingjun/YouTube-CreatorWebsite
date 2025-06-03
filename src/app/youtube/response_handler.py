@@ -61,11 +61,13 @@ class YouTubeResponseHandler:
     @staticmethod
     def _parse_video_statistics(response):
         """비디오 통계 응답 처리"""
+        channel_id = response["items"][0]['id']
         for item in response["items"]:
             duration = item["contentDetails"]["duration"]
             publish_time = transform_datetime(item['snippet']['publishedAt'])  # 업로드 날짜 추가
             is_short = is_short_video(duration)
             return {
+                "channel_id": channel_id,
                 "video_id": item["id"],
                 "title": item["snippet"]["title"],
                 "view_count": int(item["statistics"].get("viewCount", 0)),
@@ -87,12 +89,14 @@ class YouTubeResponseHandler:
             return []
 
         video_data = []
+        channel_id = response["items"][0]['id']
         for item in response['items']:
             # 유효한 YouTube 비디오인지 확인
             if item.get('id', {}).get('kind') == "youtube#video":
                 video_id = item['id'].get('videoId')
                 published_time = transform_datetime(item['snippet'].get('publishedAt'))
                 video_data.append({
+                    'channel_id': channel_id,
                     "video_id": video_id,
                     "publish_time": published_time
                 })

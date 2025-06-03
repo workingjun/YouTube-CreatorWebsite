@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, jsonify, g
 from src.app.routes import comments_bp, channel_bp
-from src.app.database import MySQLYouTubeDBFactory
+## import DB 
 from src.app.youtube import YOUTUBECreatorWebsite
 from src.app.youtube import save_main_index_to_file
 from src.utils.custom_logging import GetLogger
